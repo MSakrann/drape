@@ -39,11 +39,13 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessage("");
+    setSuccessMessage("");
 
     if (password.length < 8) {
       setErrorMessage("Use a password with at least 8 characters.");
@@ -54,10 +56,15 @@ export default function SignUpPage() {
 
     try {
       const supabase = createBrowserClient();
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email, password });
 
       if (error) {
         setErrorMessage(signUpErrorMessage(error.message));
+        return;
+      }
+
+      if (!data.session) {
+        setSuccessMessage("Check your email to confirm your account.");
         return;
       }
 
@@ -110,6 +117,11 @@ export default function SignUpPage() {
             {errorMessage ? (
               <p role="alert" className="text-sm text-[var(--drape-destructive)]">
                 {errorMessage}
+              </p>
+            ) : null}
+            {successMessage ? (
+              <p role="status" className="text-sm text-[var(--drape-accent)]">
+                {successMessage}
               </p>
             ) : null}
 

@@ -3,8 +3,15 @@ import type { Workflow } from "./types";
 export const SAMPLE_PATHS = Array.from({ length: 10 }, (_, i) => `/samples/drape-${i + 1}.jpg`);
 
 export function pickOutputPaths(workflow: Workflow): string[] {
-  const count = workflow === "variants" ? 4 : 1;
-  return SAMPLE_PATHS.slice(0, count);
+  const ranges: Record<Workflow, [start: number, count: number]> = {
+    studio: [0, 1],
+    tryon: [1, 1],
+    lifestyle: [2, 1],
+    video: [3, 1],
+    variants: [4, 4],
+  };
+  const [start, count] = ranges[workflow];
+  return SAMPLE_PATHS.slice(start, start + count);
 }
 
 export function mockDelayMs(workflow: Workflow): number {

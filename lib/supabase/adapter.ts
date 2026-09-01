@@ -70,23 +70,15 @@ export function supabaseGenerationRepo(
     },
 
     async decrementCredits(userId, amount) {
-      const { data, error: readError } = await client
-        .from("profiles")
-        .select("credits")
-        .eq("id", userId)
-        .single();
-
-      throwIfError(readError);
-      if (!data) {
-        throw new Error("Supabase did not return the profile.");
-      }
-
-      const { error } = await client
-        .from("profiles")
-        .update({ credits: data.credits - amount })
-        .eq("id", userId);
+      const { data, error } = await client.rpc("decrement_credits", {
+        p_id: userId,
+        p_amount: amount,
+      });
 
       throwIfError(error);
+      if (data === null) {
+        throw new Error("Not enough credits.");
+      }
     },
   };
 }
@@ -106,13 +98,16 @@ export function supabasePlanRepo(client: SupabaseClient): PlanRepo {
         : null;
     },
 
-    async setPlan(userId, plan, nextCredits) {
-      const { error } = await client
-        .from("profiles")
-        .update({ plan, credits: nextCredits })
-        .eq("id", userId);
+    async setPlan(userId, plan) {
+      const { data, error } = await client.rpc("choose_paid_plan", {
+        p_id: userId,
+        p_plan: plan,
+      });
 
       throwIfError(error);
+      if (!data || data.length === 0) {
+        throw new Error("You already have a plan.");
+      }
     },
   };
 }

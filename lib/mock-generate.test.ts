@@ -11,12 +11,20 @@ describe("SAMPLE_PATHS", () => {
 
 describe("pickOutputPaths", () => {
   it("returns one path for studio", () => {
-    expect(pickOutputPaths("studio")).toHaveLength(1);
-    expect(SAMPLE_PATHS).toContain(pickOutputPaths("studio")[0]);
+    expect(pickOutputPaths("studio")).toEqual([SAMPLE_PATHS[0]]);
+  });
+  it("uses a different sample for each single-output workflow", () => {
+    const paths = ["studio", "tryon", "lifestyle", "video"].map(
+      (workflow) =>
+        pickOutputPaths(
+          workflow as "studio" | "tryon" | "lifestyle" | "video",
+        )[0],
+    );
+    expect(paths).toEqual(SAMPLE_PATHS.slice(0, 4));
   });
   it("returns four distinct paths for variants", () => {
     const paths = pickOutputPaths("variants");
-    expect(paths).toHaveLength(4);
+    expect(paths).toEqual(SAMPLE_PATHS.slice(4, 8));
     expect(new Set(paths).size).toBe(4);
   });
 });

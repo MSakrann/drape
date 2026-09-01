@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: Unique;
+  src: url("/fonts/Unique-Thin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Unique;
+  src: url("/fonts/Unique-ExtraLight.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Unique;
+  src: url("/fonts/Unique-Light.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Unique;
+  src: url("/fonts/Unique-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Unique;
+  src: url("/fonts/Unique-Medium.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Unique;
+  src: url("/fonts/Unique-SemiBold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Unique;
+  src: url("/fonts/Unique-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --drape-bg: #12191B;
+  --drape-surface: #1C3331;
+  --drape-accent: #3EC9A8;
+  --drape-text: #F0EFED;
+  --drape-muted: #C2BFB9;
+  --drape-dim: #7E7C78;
+  --drape-destructive: #F44336;
+}
+
+body {
+  background: var(--drape-bg);
+  color: var(--drape-text);
+  font-family: Unique, sans-serif;
+}
+
+@keyframes drape-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+*:focus-visible {
+  outline: 3px solid var(--drape-accent);
+  outline-offset: 2px;
+}

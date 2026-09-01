@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
+import { createBrowserClient } from "@/lib/supabase/client";
 
 const navLinkClass =
   "uppercase tracking-wider text-sm font-extrabold";
@@ -15,10 +17,18 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({ signedIn, credits, onSignOut }: SiteHeaderProps) {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
   function closeMenu() {
     setMenuOpen(false);
+  }
+
+  async function handleSignOut() {
+    const supabase = createBrowserClient();
+    await supabase.auth.signOut();
+    onSignOut?.();
+    router.push("/");
   }
 
   return (
@@ -39,7 +49,7 @@ export function SiteHeader({ signedIn, credits, onSignOut }: SiteHeaderProps) {
 
         <div className="hidden items-center justify-end gap-3 lg:flex">
           {signedIn ? (
-            <SignedInActions credits={credits} onSignOut={onSignOut} />
+            <SignedInActions credits={credits} onSignOut={handleSignOut} />
           ) : (
             <PublicActions />
           )}
@@ -74,7 +84,7 @@ export function SiteHeader({ signedIn, credits, onSignOut }: SiteHeaderProps) {
                 variant="outline"
                 type="button"
                 onClick={() => {
-                  onSignOut?.();
+                  void handleSignOut();
                   closeMenu();
                 }}
               >

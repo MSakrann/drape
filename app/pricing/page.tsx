@@ -1,10 +1,13 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CREDIT_COSTS, MONTHLY_CREDITS, PLAN_PRICE_EGP } from "@/lib/credits";
+import { CREDIT_COSTS } from "@/lib/credits";
+import { getUserId } from "@/lib/supabase/adapter";
+import { createServerClient } from "@/lib/supabase/server";
+import type { Plan } from "@/lib/types";
 
-const plans = ["starter", "pro", "business", "agency"] as const;
+import { PlanCards } from "./plan-cards";
+
 const creditCosts = [
   ["Studio", CREDIT_COSTS.studio],
   ["Lifestyle", CREDIT_COSTS.lifestyle],
@@ -13,10 +16,30 @@ const creditCosts = [
   ["Video", CREDIT_COSTS.video],
 ] as const;
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const supabase = await createServerClient();
+  const userId = await getUserId(supabase);
+  let currentPlan: Plan | null = null;
+  let credits: number | undefined;
+
+  if (userId) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("plan, credits")
+      .eq("id", userId)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    currentPlan = data.plan as Plan;
+    credits = data.credits;
+  }
+
   return (
     <>
-      <SiteHeader signedIn={false} />
+      <SiteHeader signedIn={Boolean(userId)} credits={credits} />
       <main className="px-6 py-16 lg:px-10">
         <section className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
@@ -31,22 +54,10 @@ export default function PricingPage() {
             </p>
           </div>
 
-          <div className="mt-12 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {plans.map((plan) => (
-              <Card key={plan} className="flex flex-col p-6">
-                <h2 className="text-2xl font-semibold capitalize">{plan}</h2>
-                <p className="mt-7 text-4xl font-semibold">
-                  {PLAN_PRICE_EGP[plan]} EGP
-                </p>
-                <p className="mt-2 text-[var(--drape-muted)]">
-                  {MONTHLY_CREDITS[plan]} credits / month
-                </p>
-                <Button href="/sign-up" className="mt-8 w-full">
-                  Get started
-                </Button>
-              </Card>
-            ))}
-          </div>
+          <PlanCards
+            signedIn={Boolean(userId)}
+            currentPlan={currentPlan}
+          />
 
           <section className="mt-20">
             <h2 className="text-3xl font-semibold uppercase tracking-tight md:text-5xl">

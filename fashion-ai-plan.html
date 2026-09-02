@@ -1,0 +1,1267 @@
+<title>Stitch AI — Execution Plan</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,300&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0C0C0F;
+    --surface: #131318;
+    --surface-2: #1A1A22;
+    --surface-3: #212129;
+    --border: #26262F;
+    --border-subtle: #1E1E26;
+    --text-1: #F0EEF8;
+    --text-2: #8A889A;
+    --text-3: #52505F;
+    --accent: #C9AB82;
+    --accent-dim: rgba(201,171,130,0.12);
+    --accent-glow: rgba(201,171,130,0.06);
+    --done: #4FCDA5;
+    --done-dim: rgba(79,205,165,0.1);
+    --sidebar-w: 240px;
+    --radius: 8px;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-mono: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #F5F4F0;
+      --surface: #FFFFFF;
+      --surface-2: #EEECE8;
+      --surface-3: #E6E4DF;
+      --border: #DDD9D0;
+      --border-subtle: #E8E6E1;
+      --text-1: #1A1820;
+      --text-2: #6A6878;
+      --text-3: #9A98A8;
+      --accent: #8B6A3E;
+      --accent-dim: rgba(139,106,62,0.1);
+      --accent-glow: rgba(139,106,62,0.04);
+      --done: #1F9E75;
+      --done-dim: rgba(31,158,117,0.08);
+    }
+  }
+
+  :root[data-theme="light"] {
+    --bg: #F5F4F0;
+    --surface: #FFFFFF;
+    --surface-2: #EEECE8;
+    --surface-3: #E6E4DF;
+    --border: #DDD9D0;
+    --border-subtle: #E8E6E1;
+    --text-1: #1A1820;
+    --text-2: #6A6878;
+    --text-3: #9A98A8;
+    --accent: #8B6A3E;
+    --accent-dim: rgba(139,106,62,0.1);
+    --accent-glow: rgba(139,106,62,0.04);
+    --done: #1F9E75;
+    --done-dim: rgba(31,158,117,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .layout {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .sidebar-header {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .sidebar-logo {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-1);
+    letter-spacing: -0.02em;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .sidebar-sub {
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .sidebar-progress-wrap {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .sidebar-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 6px;
+    letter-spacing: 0.03em;
+  }
+
+  .sidebar-progress-bar {
+    height: 3px;
+    background: var(--surface-3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .sidebar-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 8px 0;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+    border-left: 2px solid transparent;
+  }
+
+  .nav-item:hover { background: var(--surface-2); }
+  .nav-item.active {
+    background: var(--accent-dim);
+    border-left-color: var(--accent);
+  }
+
+  .nav-phase-badge {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--text-3);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .nav-item.phase-done .nav-phase-badge {
+    background: var(--done-dim);
+    border-color: var(--done);
+    color: var(--done);
+  }
+
+  .nav-item.active .nav-phase-badge {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .nav-item-content { flex: 1; min-width: 0; }
+
+  .nav-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-item.active .nav-title { color: var(--text-1); }
+
+  .nav-week {
+    font-size: 10px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+  }
+
+  .nav-progress-mini {
+    width: 28px;
+    height: 3px;
+    background: var(--surface-3);
+    border-radius: 2px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .nav-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s;
+  }
+
+  .phase-done .nav-progress-fill { background: var(--done); }
+
+  .sidebar-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--text-3);
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--font-body);
+    letter-spacing: 0.03em;
+  }
+
+  .theme-toggle:hover { color: var(--text-2); }
+
+  /* ── Main content ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    max-width: calc(100% - var(--sidebar-w));
+  }
+
+  .main-header {
+    padding: 48px 56px 40px;
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--surface);
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .main-title {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    color: var(--text-1);
+    line-height: 1.15;
+    text-wrap: balance;
+    margin-bottom: 12px;
+  }
+
+  .main-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .main-desc {
+    font-size: 14px;
+    color: var(--text-2);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  .summary-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+  }
+
+  .summary-cell {
+    background: var(--surface);
+    padding: 18px 24px;
+  }
+
+  .summary-val {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--text-1);
+    letter-spacing: -0.03em;
+  }
+
+  .summary-lbl {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Phases ── */
+  .phases {
+    padding: 0 56px 80px;
+  }
+
+  .phase {
+    padding-top: 56px;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .phase-number {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+    flex-shrink: 0;
+    width: 36px;
+  }
+
+  .phase-meta { flex: 1; }
+
+  .phase-title {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text-1);
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+    margin-bottom: 6px;
+  }
+
+  .phase-tagline {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.6;
+    max-width: 500px;
+  }
+
+  .phase-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .week-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid rgba(201,171,130,0.2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .phase-prog-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+  }
+
+  .phase-prog-bar {
+    width: 80px;
+    height: 3px;
+    background: var(--surface-3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .phase-prog-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s;
+  }
+
+  .phase-done-all .phase-prog-fill { background: var(--done); }
+
+  /* ── Tasks ── */
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.12s;
+    position: relative;
+  }
+
+  .task:hover { background: var(--surface-2); }
+  .task.done { background: var(--done-dim); }
+  .task.done:hover { background: rgba(79,205,165,0.13); }
+
+  .task-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    background: var(--surface-2);
+  }
+
+  .task.done .task-check {
+    background: var(--done);
+    border-color: var(--done);
+  }
+
+  .task-check-icon {
+    display: none;
+    color: #0C0C0F;
+  }
+
+  .task.done .task-check-icon { display: block; }
+
+  .task-body { flex: 1; }
+
+  .task-text {
+    font-size: 13.5px;
+    color: var(--text-2);
+    line-height: 1.55;
+    transition: color 0.15s;
+  }
+
+  .task.done .task-text {
+    color: var(--text-3);
+    text-decoration: line-through;
+    text-decoration-color: var(--done);
+    text-decoration-thickness: 1px;
+  }
+
+  .task-code {
+    margin-top: 7px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--accent);
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+
+  .task-note {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.55;
+    padding-left: 10px;
+    border-left: 2px solid var(--border);
+  }
+
+  .task-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+    margin-top: -1px;
+  }
+
+  .tag-tool { background: rgba(100,120,255,0.12); color: #8899FF; }
+  .tag-bg { background: rgba(255,160,80,0.12); color: #FFA050; }
+  .tag-parallel { background: rgba(160,100,255,0.12); color: #BB88FF; }
+  .tag-critical { background: rgba(255,80,80,0.12); color: #FF8080; }
+
+  .section-group {
+    margin-bottom: 6px;
+  }
+
+  .section-group-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    padding: 14px 16px 6px;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 200px; }
+    .main { margin-left: 200px; max-width: calc(100% - 200px); }
+    .main-header { padding: 32px 32px 28px; }
+    .phases { padding: 0 32px 60px; }
+    .summary-strip { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; max-width: 100%; }
+    .main-header { padding: 24px 20px; }
+    .phases { padding: 0 20px 60px; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-logo">Stitch AI</span>
+      <span class="sidebar-sub">Execution Plan</span>
+    </div>
+
+    <div class="sidebar-progress-wrap">
+      <div class="sidebar-progress-label">
+        <span>Overall Progress</span>
+        <span id="overall-pct">0%</span>
+      </div>
+      <div class="sidebar-progress-bar">
+        <div class="sidebar-progress-fill" id="overall-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+          <circle cx="6" cy="6" r="3"/>
+          <path d="M6 0v2M6 10v2M0 6h2M10 6h2M1.76 1.76l1.41 1.41M8.83 8.83l1.41 1.41M1.76 10.24l1.41-1.41M8.83 3.17l1.41-1.41" stroke="currentColor" stroke-width="1" fill="none"/>
+        </svg>
+        Toggle theme
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="main-header">
+      <p class="eyebrow">AI Fashion Photography SaaS · Egypt</p>
+      <h1 class="main-title">From idea to<br><em>first paying customer.</em></h1>
+      <p class="main-desc">A complete, task-by-task execution plan. Check off tasks as you complete them — progress saves automatically in your browser.</p>
+    </div>
+
+    <div class="summary-strip">
+      <div class="summary-cell">
+        <div class="summary-val">13</div>
+        <div class="summary-lbl">Weeks to launch</div>
+      </div>
+      <div class="summary-cell">
+        <div class="summary-val" id="total-tasks-display">—</div>
+        <div class="summary-lbl">Total tasks</div>
+      </div>
+      <div class="summary-cell">
+        <div class="summary-val" id="done-tasks-display">0</div>
+        <div class="summary-lbl">Completed</div>
+      </div>
+      <div class="summary-cell">
+        <div class="summary-val">9</div>
+        <div class="summary-lbl">Phases</div>
+      </div>
+    </div>
+
+    <div class="phases" id="phases-container"></div>
+  </main>
+</div>
+
+<script>
+const PHASES = [
+  {
+    id: 'p0',
+    number: 'P–00',
+    title: 'Foundation & Setup',
+    tagline: 'Prepare both Mac Minis, all accounts, and cloud infrastructure before writing a single line of product code.',
+    week: 'Week 1',
+    groups: [
+      {
+        label: 'Hardware & OS',
+        tasks: [
+          { text: 'Verify both Mac Minis are M4 or M4 Pro with 24GB+ unified memory. Less than 24GB will bottleneck LoRA training.' },
+          { text: 'Format both Mac Minis to clean macOS (latest version). Name them clearly: mac-mini-1 (training), mac-mini-2 (inference/dev).' },
+          { text: 'Install Homebrew on both machines:', code: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"' },
+          { text: 'Install core dev tools on both:', code: 'brew install python@3.11 node@20 git ffmpeg wget redis imagemagick' },
+          { text: 'Install Conda for Python environment management (easier than venv for ML work):', code: 'brew install miniconda\nconda init zsh' },
+          { text: 'Connect a large external SSD to Mac Mini 1 (4TB+). Dataset will be 500GB–1TB raw. Format as APFS.' },
+        ]
+      },
+      {
+        label: 'Cloud & Service Accounts',
+        tasks: [
+          { text: 'Create a GitHub account and new organization for your company. Create private repo: stitch-ai-core.' },
+          { text: 'Create a RunPod account at runpod.io. Add billing. You\'ll use this for production GPU inference and overflow training.', tag: 'critical' },
+          { text: 'Create a Cloudflare account. Set up one R2 bucket: stitch-ai-assets. Enable public access for output delivery.', note: 'R2 is far cheaper than S3 for egress. ~$0.015/GB storage, free egress.' },
+          { text: 'Create an Apify account at apify.com. Subscribe to at least the Starter plan ($49/mo) for the Instagram scraper.' },
+          { text: 'Subscribe to a rotating proxy service: Smartproxy (smartproxy.com) or Bright Data. Budget ~$50–100/month. Required for scraping at scale without getting IP-banned.' },
+          { text: 'Create a Hugging Face account at huggingface.co. You\'ll need this to download FLUX.1-dev and other models. Request access to gated models.' },
+          { text: 'Create a Stripe account for payments (stripe.com). Alternatively set up Paymob (paymob.com) for Egyptian local card acceptance. Ideally both.' },
+          { text: 'Register your domain name. Keep it short, English-friendly, and fashion-related. E.g. stitchai.co, trystitich.com.' },
+          { text: 'Create a DigitalOcean or Hetzner account for your backend VPS. Start with a $20/month droplet (4 vCPU, 8GB RAM). You can scale later.' },
+          { text: 'Create a Shopify Partner account at partners.shopify.com (free). Required to build the Shopify app integration.' },
+          { text: 'Create a Salla developer account at salla.dev (free). Required for the Salla integration.' },
+          { text: 'Create a Twilio account for WhatsApp notifications (twilio.com). You\'ll use this to notify users when their generation is ready.' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'p1',
+    number: 'P–01',
+    title: 'Dataset Collection',
+    tagline: 'Build your primary competitive asset: 200,000+ labeled Egyptian fashion images. Most of this runs unattended in the background.',
+    week: 'Weeks 2–4',
+    groups: [
+      {
+        label: 'Instagram Scraping',
+        tasks: [
+          { text: 'Build your target list: research 500+ active Egyptian fashion brand Instagram accounts. Look for brands with 5K–500K followers selling clothing. Save list as accounts.txt.', note: 'Search: #عبايات #موضة_مصر #ملابس_محجبات #فستان #fashion_egypt in Instagram to find active sellers.' },
+          { text: 'Build hashtag list for Egyptian fashion:', code: '#عبايات #موضة_مصر #ملابس_محجبات #فستان #موداليست\n#hijab_fashion #modest_fashion_egypt #كافتان\n#مودة #ملابس #موضة #جلابية #لوك' },
+          { text: 'Set up Apify Instagram Scraper actor. Configure it with your accounts list and hashtags. Set output format to JSON with image URLs.', tag: 'tool' },
+          { text: 'Run first Apify scraper batch on hashtags (expect 50,000–100,000 image URLs). Monitor credit usage.' },
+          { text: 'Run second batch on the 500 account list (expect another 100,000+ URLs).' },
+          { text: 'Install Instaloader as backup for accounts Apify misses:', code: 'pip install instaloader\n# Example usage:\ninstaloader --no-videos --no-captions brandname' },
+        ]
+      },
+      {
+        label: 'Shopify & Platform Scraping',
+        tasks: [
+          { text: 'Research Egyptian brands on Shopify. Use BuiltWith (builtwith.com) to find Egyptian sites running Shopify. Export list.' },
+          { text: 'Write Python script to harvest /products.json from each Shopify store. This endpoint is public and doesn\'t require scraping.', code: 'import requests, json\n\nstores = open("shopify_stores.txt").read().splitlines()\nurls = []\nfor store in stores:\n    try:\n        r = requests.get(f"https://{store}/products.json?limit=250", timeout=5)\n        products = r.json().get("products", [])\n        for p in products:\n            for img in p.get("images", []):\n                urls.append(img["src"])\n    except: pass\nwith open("shopify_urls.txt","w") as f:\n    f.write("\\n".join(urls))' },
+          { text: 'Install Scrapy for Jumia and other sites:', code: 'pip install scrapy scrapy-rotating-proxies scrapy-user-agents' },
+          { text: 'Write Scrapy spider for Jumia Egypt fashion section (jumia.com.eg/mlp-fashion). Configure with rotating proxies and 2–3 second delays between requests to avoid bans.', tag: 'tool' },
+          { text: 'Write Scrapy spiders for: Namshi Egypt, Ounass Egypt, and any major Egyptian fashion marketplace you find active.' },
+          { text: 'Combine all collected URLs into one master file. Deduplicate:', code: 'sort all_urls.txt | uniq > master_urls.txt\nwc -l master_urls.txt  # should be 300,000+' },
+        ]
+      },
+      {
+        label: 'Bulk Download',
+        tasks: [
+          { text: 'Install img2dataset — the tool used to build LAION, the largest open image dataset:', code: 'pip install img2dataset' },
+          { text: 'Create img2dataset config (config.yaml):', code: 'url_list: master_urls.txt\noutput_folder: /Volumes/ExternalSSD/fashion_dataset\noutput_format: webdataset\nimage_size: 1024\nresize_mode: center_crop\nnumber_sample_per_shard: 1000\nprocesses_count: 8\nthread_count: 32\nsave_metadata: true\nretries: 2' },
+          { text: 'Run img2dataset. This will run for 1–2 weeks unattended on Mac Mini 1:', code: 'img2dataset --config_file config.yaml' },
+          { text: 'Monitor progress every day. Check logs for error rates. A >30% failure rate means too many dead URLs — investigate and clean.' },
+          { text: 'Expected output: 180,000–250,000 successfully downloaded images in WebDataset (.tar) shards on your external SSD.' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'p2',
+    number: 'P–02',
+    title: 'Dataset Processing',
+    tagline: 'Clean, filter, and label your raw images. AI labels AI training data — no manual annotation needed.',
+    week: 'Weeks 4–5',
+    groups: [
+      {
+        label: 'Cleaning & Deduplication',
+        tasks: [
+          { text: 'Install processing libraries:', code: 'pip install imagehash Pillow torch torchvision tqdm pandas' },
+          { text: 'Write and run deduplication script using perceptual hashing. Remove images where hash distance < 8 (near-duplicates):', code: 'from PIL import Image\nimport imagehash, os\nfrom tqdm import tqdm\n\nseen = set()\nduplicates = []\nfor img_path in tqdm(all_images):\n    h = imagehash.phash(Image.open(img_path))\n    if any(h - s < 8 for s in seen):\n        duplicates.append(img_path)\n    else:\n        seen.add(h)' },
+          { text: 'Write quality filter script. Remove: images below 512×512px, corrupt files, images where CLIP confidence for "fashion clothing" < 0.3.', tag: 'critical' },
+          { text: 'Run quality filter across full dataset. Expect to remove 20–40% of raw images. Target: 130,000–180,000 clean images remaining.' },
+        ]
+      },
+      {
+        label: 'Auto-Labeling with AI',
+        tasks: [
+          { text: 'Install FashionCLIP:', code: 'pip install fashion-clip' },
+          { text: 'Run FashionCLIP across entire clean dataset to classify each image. Categories to extract: garment_type, shot_type, background_type.', code: 'from fashion_clip.fashion_clip import FashionCLIP\nfclip = FashionCLIP("fashion-clip")\n\ngarment_types = ["abaya","kaftan","dress","top","pants","skirt","suit","accessories"]\nshot_types = ["flat_lay","mannequin","on_model","detail_shot"]\nbg_types = ["white_studio","lifestyle","outdoor","plain_color"]' },
+          { text: 'Install Florence-2 from Hugging Face for caption generation:', code: 'pip install transformers accelerate\n# Model: microsoft/Florence-2-large' },
+          { text: 'Run Florence-2 on 30% of the dataset to generate detailed text captions in English. These become training captions for the LoRA.', note: 'This will take 24–48 hours on Mac Mini. Run on a dedicated conda environment.' },
+          { text: 'Write color extraction script using k-means clustering on each image. Output: dominant_color (hex), secondary_color (hex), color_name.', tag: 'tool' },
+          { text: 'Assemble final metadata JSONL file. One line per image:', code: '{"file": "shard_001/000001.jpg", "caption": "Black linen abaya...", "category": "abaya", "shot_type": "on_model", "background": "white_studio", "color": "#1A1A1A", "color_name": "black"}' },
+          { text: 'Organize final dataset into WebDataset shards. Each shard = 1,000 images + their caption .txt files. Store on external SSD and upload index to Cloudflare R2.' },
+          { text: 'Final dataset audit: open 500 random images manually. Grade quality A/B/C. Remove all C-grade images. Your training quality is only as good as your worst 10% of images.', tag: 'critical' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'p3',
+    number: 'P–03',
+    title: 'Model Fine-tuning',
+    tagline: 'Train your Egyptian fashion LoRA on FLUX.1-dev. This is your core technical moat — a model no competitor can replicate.',
+    week: 'Weeks 5–7',
+    groups: [
+      {
+        label: 'Training Setup',
+        tasks: [
+          { text: 'Create a dedicated conda environment for training:', code: 'conda create -n stitchtrain python=3.11\nconda activate stitchtrain' },
+          { text: 'Clone SimpleTuner (best FLUX LoRA training tool available):', code: 'git clone https://github.com/bghira/SimpleTuner\ncd SimpleTuner\npip install -r requirements.txt' },
+          { text: 'Download FLUX.1-dev base model from Hugging Face (~24GB). Requires accepted license and HF token:', code: 'pip install huggingface_hub\nhuggingface-cli login\nhuggingface-cli download black-forest-labs/FLUX.1-dev --local-dir ./models/flux1-dev' },
+          { text: 'Create SimpleTuner training config (config/egyptian_fashion.json). Key parameters:', code: '{\n  "model_type": "flux",\n  "model_family": "flux",\n  "pretrained_model_name_or_path": "./models/flux1-dev",\n  "lora_rank": 64,\n  "lora_alpha": 64,\n  "learning_rate": 1e-4,\n  "train_batch_size": 1,\n  "max_train_steps": 15000,\n  "save_every_n_steps": 2000,\n  "mixed_precision": "bf16",\n  "caption_dropout_probability": 0.05\n}' },
+          { text: 'Split dataset: 90% training / 10% validation. Create validation set of 200 diverse garment types.' },
+        ]
+      },
+      {
+        label: 'Training Runs',
+        tasks: [
+          { text: 'Run first training pass on Mac Mini 1 (estimated 15–24 hours):', code: 'python train.py --config config/egyptian_fashion.json' },
+          { text: 'Monitor training loss in real-time. It should drop from ~0.1 to ~0.02 over 15K steps. A plateau or spike means something is wrong.', tag: 'critical' },
+          { text: 'Generate test images at checkpoints every 2,000 steps. Use these 5 test prompts: "black linen abaya on white background, product photography", "flowing kaftan dress, studio shot, Egyptian model", "modest fashion outfit flat lay", "summer dress with Egyptian print, clean white background", "detailed embroidery abaya".' },
+          { text: 'Evaluate checkpoint images: check color accuracy against reference, fabric texture sharpness, garment structure integrity. Score each 1–5.' },
+          { text: 'If color accuracy is poor (< 3/5): add 5,000 more flat-lay and studio shots to training set with specific color captions. Retrain.', tag: 'critical' },
+          { text: 'Run parallel experiments on Mac Mini 2: test LoRA rank 32 vs 128, learning rate 5e-5 vs 2e-4. Compare outputs.', tag: 'parallel' },
+          { text: 'Select best checkpoint. Rename it: egyptian_fashion_v1.safetensors. This is your base LoRA.' },
+          { text: 'Run final qualitative test: generate 200 product images from the validation set. Manually review for publishable quality. Target: >75% publishable without retouching.', tag: 'critical' },
+        ]
+      },
+      {
+        label: 'Virtual Try-On Setup',
+        tasks: [
+          { text: 'Clone CatVTON (best open-source virtual try-on model):', code: 'git clone https://github.com/Zheng-Chong/CatVTON\npip install -r CatVTON/requirements.txt' },
+          { text: 'Download CatVTON model weights from Hugging Face: zheng-chong/CatVTON' },
+          { text: 'Build your Egyptian model reference library: photograph or source 30–50 reference model images (diverse skin tones, body types, hijab/no hijab). Store as PNG with transparent background.' },
+          { text: 'Test CatVTON with 20 sample garments from your dataset against 5 model references. Quality check: does the garment drape naturally? Are colors preserved?', tag: 'critical' },
+          { text: 'If try-on quality is insufficient: test IDM-VTON as an alternative (github.com/yisol/IDM-VTON). Compare outputs.' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'p4',
+    number: 'P–04',
+    title: 'ComfyUI Workflows',
+    tagline: 'Build the five AI pipelines that power every feature. These become the API endpoints your backend calls.',
+    week: 'Weeks 5–7 (parallel)',
+    parallel: true,
+    groups: [
+      {
+        label: 'ComfyUI Installation',
+        tasks: [
+          { text: 'Install ComfyUI on Mac Mini 2 (the inference machine):', code: 'git clone https://github.com/comfyanonymous/ComfyUI\ncd ComfyUI\npip install -r requirements.txt' },
+          { text: 'Install ComfyUI-Manager (node manager):', code: 'cd ComfyUI/custom_nodes\ngit clone https://github.com/ltdrdata/ComfyUI-Manager' },
+          { text: 'Through ComfyUI-Manager, install these custom node packs: ComfyUI-BiRefNet (background removal), ComfyUI-WanVideo, ComfyUI-LTXVideo, ComfyUI-VideoHelperSuite, ComfyUI-IPAdapter-plus, ComfyUI-ControlNet-Aux.' },
+          { text: 'Download all model weights needed: BiRefNet-general (background removal), LTX-Video-2.5, Wan Animate 2 (14B variant for quality). Place in ComfyUI/models/ directories.' },
+          { text: 'Verify ComfyUI starts and all models are detected:', code: 'python main.py --listen 0.0.0.0 --port 8188' },
+        ]
+      },
+      {
+        label: 'Workflow 1: Studio Product Shot',
+        tasks: [
+          { text: 'Build this workflow in ComfyUI canvas: Load Image → BiRefNet Background Removal → FLUX KSampler (with your LoRA loaded) → ESRGAN Upscale → Save Image' },
+          { text: 'Key parameters to expose as API inputs: background_style (white_studio / clean_grey / gradient), output_resolution (1024x1024 / 1200x1600 / 800x800).' },
+          { text: 'Test with 30 real Egyptian product photos. Color must be within 10% of original (measure with PIL color comparison script).' },
+          { text: 'Export workflow as JSON: workflow_studio.json. This file is what your backend sends to ComfyUI API.' },
+        ]
+      },
+      {
+        label: 'Workflow 2: Virtual Try-On',
+        tasks: [
+          { text: 'Build workflow: Load Product Image → Load Model Reference → BiRefNet garment extraction → CatVTON inference → Post-process → Save.' },
+          { text: 'Expose as API inputs: model_reference_id (from your library of 50 Egyptian model references), garment_category (dress/abaya/top/etc).' },
+          { text: 'Test with 20 diverse garments. Check: garment drape is natural, color preserved, no seam artifacts, model face/hands look natural.' },
+          { text: 'Export as: workflow_tryon.json' },
+        ]
+      },
+      {
+        label: 'Workflow 3: Lifestyle Background',
+        tasks: [
+          { text: 'Build workflow: Load Image → BiRefNet extraction → FLUX inpainting with lifestyle background prompt → Blend/composite → Save.' },
+          { text: 'Create a preset library of 20 lifestyle background prompts (Nile view, modern Cairo interior, European street, beach, minimal modern room, etc.). Store as background_presets.json.' },
+          { text: 'Test with 20 garments. Key quality check: product lighting must match background lighting. Adjust prompts until this looks natural.' },
+          { text: 'Export as: workflow_lifestyle.json' },
+        ]
+      },
+      {
+        label: 'Workflow 4: Product Video',
+        tasks: [
+          { text: 'Build workflow: Load Image (studio shot or try-on output) → Wan Animate 2 → VideoHelperSuite trim/loop → Save Video.' },
+          { text: 'Animate prompts to test: "model walks forward slowly, fabric moves naturally", "gentle 360 rotation showing garment", "subtle fabric movement, model standing".' },
+          { text: 'Target output: 15–30 seconds, 720x1280 (vertical for Reels/TikTok), 24fps, MP4.', tag: 'critical' },
+          { text: 'Test with 10 garments. Key quality: no warping of garment, no face distortion, smooth motion. LTX Video 2.5 as fallback if Wan has quality issues.' },
+          { text: 'Export as: workflow_video.json' },
+        ]
+      },
+      {
+        label: 'Workflow 5: Color Variants',
+        tasks: [
+          { text: 'Build workflow: Load Image → Garment extraction → IP-Adapter color conditioning → FLUX generation per color → Batch save.' },
+          { text: 'Input: target_colors array (e.g. ["navy blue", "dusty rose", "olive green", "cream"]).' },
+          { text: 'Test: Generate the same abaya in 6 color variants. Verify each color is distinct and accurate. This is technically the hardest workflow — iterate until quality is good.' },
+          { text: 'Export as: workflow_variants.json' },
+        ]
+      },
+      {
+        label: 'API Setup',
+        tasks: [
+          { text: 'Set up ComfyUI to run as a persistent headless API service (no GUI). Test the API endpoint:', code: 'curl -X POST http://localhost:8188/prompt \\\n  -H "Content-Type: application/json" \\\n  -d @workflow_studio.json' },
+          { text: 'Write a Python wrapper class: ComfyUIClient that abstracts workflow execution, progress polling, and output retrieval. This is what your backend will use.' },
+          { text: 'Benchmark generation times for each workflow type on Mac Mini 2. Document: Studio (~25s), Try-on (~45s), Lifestyle (~30s), Video (~4 min), Variants (~90s).' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'p5',
+    number: 'P–05',
+    title: 'Backend Development',
+    tagline: 'The engine that ties everything together: job queue, cloud GPU routing, integrations, and billing.',
+    week: 'Weeks 6–9',
+    groups: [
+      {
+        label: 'Project Foundation',
+        tasks: [
+          { text: 'Initialize a Next.js 14+ project with TypeScript and App Router. This covers frontend and API routes in one repo:', code: 'npx create-next-app@latest stitch-ai --typescript --app --tailwind\ncd stitch-ai' },
+          { text: 'Install core backend packages:', code: 'npm install @prisma/client prisma bullmq ioredis\nnpm install @aws-sdk/client-s3 @cloudflare/r2\nnpm install stripe @clerk/nextjs\nnpm install zod axios sharp' },
+          { text: 'Set up PostgreSQL. On your VPS: `apt install postgresql`. Create database: stitch_ai_prod. On local: use Docker or brew install postgresql.' },
+          { text: 'Initialize Prisma:', code: 'npx prisma init\n# Edit prisma/schema.prisma with your models' },
+        ]
+      },
+      {
+        label: 'Database Schema',
+        tasks: [
+          { text: 'Design and implement Prisma schema with these models: User, Subscription, CreditLedger (all credit transactions), GenerationJob, OutputFile, ProductImage, BrandLoRA, StoreConnection.', tag: 'critical' },
+          { text: 'Key GenerationJob fields: id, userId, workflow_type (enum), status (QUEUED/RUNNING/DONE/FAILED), input_image_url, output_urls[], credits_used, created_at, completed_at, gpu_provider (LOCAL/RUNPOD), error_message.' },
+          { text: 'Run migrations:', code: 'npx prisma migrate dev --name init\nnpx prisma generate' },
+        ]
+      },
+      {
+        label: 'Authentication',
+        tasks: [
+          { text: 'Set up Clerk for authentication (clerk.com). Install and configure with your Next.js app. Handles email, Google login, session management.' },
+          { text: 'Create middleware to protect all /api/generate/* routes. Inject userId into every authenticated request.' },
+          { text: 'Build onboarding webhook: when new user signs up via Clerk → create User record in DB → grant 20 free trial credits.' },
+        ]
+      },
+      {
+        label: 'Job Queue',
+        tasks: [
+          { text: 'Set up Redis on your VPS:', code: 'apt install redis-server\nredis-cli ping  # should return PONG' },
+          { text: 'Create BullMQ queues in lib/queues.ts:', code: "import { Queue } from 'bullmq';\nexport const imageQueue = new Queue('image-gen', {connection});\nexport const videoQueue = new Queue('video-gen', {connection});" },
+          { text: 'Write imageWorker.ts: picks up image jobs, decides LOCAL vs RUNPOD based on queue depth, calls ComfyUIClient or RunPod API, stores output to R2, updates DB.', tag: 'critical' },
+          { text: 'Write videoWorker.ts: same logic but longer timeout (10 min max). Videos go straight to RunPod since Mac Mini is too slow for production video.' },
+          { text: 'Write queue router logic: if Mac Mini queue has < 3 pending jobs → route to local. Otherwise → route to RunPod. Check every 30 seconds.' },
+        ]
+      },
+      {
+        label: 'RunPod Integration',
+        tasks: [
+          { text: 'Create a RunPod Serverless endpoint with your ComfyUI Docker image. Use RunPod\'s comfyui-worker template as the base.', note: 'RunPod documentation: docs.runpod.io/serverless' },
+          { text: 'Upload your LoRA weights and ComfyUI workflow JSONs to the RunPod pod template. These need to be available at container start.' },
+          { text: 'Write RunPodClient class in lib/runpod.ts: submit job, poll status, retrieve output. Handle timeout and retry logic.' },
+          { text: 'Test: submit a studio shot job to RunPod. Verify output quality matches local ComfyUI. Should be identical — same models, same workflow.' },
+          { text: 'Implement cost tracking: log RunPod cost per job in GenerationJob.gpu_cost. Build admin view of daily GPU spend.' },
+        ]
+      },
+      {
+        label: 'Platform Integrations',
+        tasks: [
+          { text: 'Build Shopify OAuth app flow: install URL, callback, store access token securely in StoreConnection table. Follow Shopify\'s app auth docs exactly.', tag: 'tool' },
+          { text: 'Build Shopify product sync: after connect, fetch all products via REST API, store product images in ProductImage table with shopify_id reference.' },
+          { text: 'Set up Shopify webhook: product/create → auto-import new product images when the store owner adds products.' },
+          { text: 'Build Salla OAuth integration. Salla docs: salla.dev. Similar flow — OAuth, access token, product sync.' },
+          { text: 'Build "Manual Upload" fallback: user uploads product images directly in the app (no store connection needed). Use Cloudflare R2 signed upload URLs.' },
+        ]
+      },
+      {
+        label: 'Billing & Subscriptions',
+        tasks: [
+          { text: 'Create Stripe products and prices for each tier: Starter (400 EGP = ~$8/mo), Pro (1000 EGP = ~$20/mo), Business (2500 EGP = ~$50/mo), Agency (6000 EGP = ~$120/mo).' },
+          { text: 'Implement Stripe checkout session creation in /api/billing/checkout.' },
+          { text: 'Build Stripe webhook handler in /api/webhooks/stripe: handle checkout.session.completed (activate subscription + grant credits), invoice.paid (renew monthly credits), customer.subscription.deleted (downgrade to free).', tag: 'critical' },
+          { text: 'Set up Paymob as alternative for Egyptian card payments. Paymob supports local Egyptian Visa/Mastercard/Meeza cards without international fees.' },
+          { text: 'Build credit deduction middleware: before any generation job is queued, check credit balance. Reject with 402 if insufficient. Deduct atomically using DB transaction.' },
+          { text: 'Define credit costs per workflow type in config/credits.ts: studio=1, tryon=2, lifestyle=1, video=10, variants=4, video_30s=15.' },
+        ]
+      },
+      {
+        label: 'Notifications',
+        tasks: [
+          { text: 'Build WhatsApp notification service using Twilio WhatsApp API. When a generation job completes → send user a WhatsApp message with output preview link.', note: 'Egyptian users will use this more than email.' },
+          { text: 'Build in-app notification store: mark generation complete in real-time via Server-Sent Events (SSE) or WebSocket. User sees notification without refreshing.' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'p6',
+    number: 'P–06',
+    title: 'Frontend Development',
+    tagline: 'The interface Egyptian fashion brands interact with daily. Arabic-first, mobile-aware, and dead simple to use.',
+    week: 'Weeks 8–10',
+    groups: [
+      {
+        label: 'Design System',
+        tasks: [
+          { text: 'Define CSS custom properties for colors, typography, spacing. Arabic RTL support: add dir="rtl" toggle and ensure all layouts work in both directions.' },
+          { text: 'Set up component library: Button, Input, Card, Modal, Badge, Progress, Toast. Keep it simple — no over-engineered component system needed at this stage.' },
+          { text: 'Implement Arabic/English language toggle using next-intl or next-i18next. Translate all UI strings into Egyptian Arabic.' },
+        ]
+      },
+      {
+        label: 'Core Pages',
+        tasks: [
+          { text: 'Build Landing Page: hero with before/after product image comparison slider, pricing section, how-it-works (3 steps), footer. This is your sales page — invest real time in it.' },
+          { text: 'Build Auth pages: Sign Up, Sign In, Password Reset — Clerk handles the logic, you style the forms to match your brand.' },
+          { text: 'Build Onboarding flow (3 steps): Step 1 = Connect Store (Shopify/Salla/Manual Upload), Step 2 = Choose Plan, Step 3 = First Generation tutorial. Non-skippable.' },
+          { text: 'Build main Dashboard: credit balance widget (prominent, top-right), recent generations grid (last 12), quick-generate shortcut, store connection status indicator.' },
+        ]
+      },
+      {
+        label: 'Core Product Flow',
+        tasks: [
+          { text: 'Build Product Library page: paginated grid of all imported products, filter by category/status/date, bulk select mode, "Generate All Selected" button.', tag: 'critical' },
+          { text: 'Build Generation Modal/Page (the core UX). Tabs across the top: Studio | Try-On | Lifestyle | Video | Variants. Each tab shows its specific options. Submit button shows credit cost before confirming.' },
+          { text: 'Build real-time generation progress: after submission, show animated progress indicator with stage labels ("Removing background...", "Generating image...", "Upscaling..."). Poll job status every 3 seconds via SSE.' },
+          { text: 'Build Results view: generated images in a clean grid, zoom on hover/tap, download individual button, download all as zip, regenerate button (uses same credit), send to gallery button.' },
+          { text: 'Build Model Reference Selector (for Try-On): grid of 50 Egyptian model reference photos. Filter by: skin tone (light/medium/tan/dark), hijab (yes/no), body type. User bookmarks favorites.' },
+        ]
+      },
+      {
+        label: 'Supporting Pages',
+        tasks: [
+          { text: 'Build Output Gallery: all generated images and videos, searchable and filterable by product/type/date. Masonry grid layout. Bulk download. One-click copy to clipboard.' },
+          { text: 'Build Billing page: current plan highlighted, credit balance with usage bar, credit purchase options, billing history table, cancel/upgrade/downgrade buttons.' },
+          { text: 'Build Settings page: connected stores (connect/disconnect/re-sync), notification preferences (WhatsApp number, email), brand LoRA section (upload images to train brand style — shows as "Coming Soon" for non-Business tier).' },
+          { text: 'Build Admin panel (for your own use only, protected by your email): all users, active subscriptions, daily generation counts, GPU cost per day, revenue MRR counter, failed jobs list.' },
+        ]
+      },
+      {
+        label: 'Polish & QA',
+        tasks: [
+          { text: 'Mobile responsiveness: test every core flow on iPhone 14 screen size. The generation flow must work on mobile — many users will check results on their phone.' },
+          { text: 'Empty states: every list/gallery page needs a thoughtful empty state with a clear CTA. "No products yet → Connect your store" etc.' },
+          { text: 'Error handling: every API call needs a proper error state with a human-readable message in Arabic and English. No raw error codes visible to users.' },
+          { text: 'Loading states: every async operation needs a skeleton or spinner. No blank content flashes.' },
+          { text: 'Keyboard accessibility: all interactive elements focusable, visible focus ring. Tab order makes sense.' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'p7',
+    number: 'P–07',
+    title: 'Beta Testing',
+    tagline: 'Find 10 real Egyptian fashion brands. Give them free access. Let their feedback shape the final product.',
+    week: 'Weeks 11–12',
+    groups: [
+      {
+        label: 'Beta Recruitment',
+        tasks: [
+          { text: 'Build a simple beta waitlist landing page (before full product launch). Collect: brand name, Instagram handle, monthly content spend, email, WhatsApp number.' },
+          { text: 'DM 100 Egyptian fashion brands on Instagram explaining the beta program. Offer 3 months free access (worth ~3,000 EGP) in exchange for feedback sessions.' },
+          { text: 'Post in Egyptian e-commerce Facebook groups (مجموعة المتاجر الإلكترونية المصرية and similar). Explain the product clearly, post a before/after example.' },
+          { text: 'Target profile for beta users: brands posting 15+ times/month on Instagram, selling through Shopify or Salla, have at least 10K followers. These are active enough to give real feedback.' },
+          { text: 'Select 10 beta users from applicants. Prioritize variety: mix of abayas, casual fashion, accessories, different price points, different store sizes.' },
+        ]
+      },
+      {
+        label: 'Beta Onboarding & Testing',
+        tasks: [
+          { text: 'Onboard each beta user personally via WhatsApp call (30 min). Walk them through the flow. Watch where they get confused — those are your UX bugs.' },
+          { text: 'Grant each beta user 500 credits (enough for ~200 studio shots or ~30 videos). No expiry.' },
+          { text: 'Send each user a structured feedback form after their first week: Was the color accurate? Did you actually use/post any outputs? What feature is missing? Rate quality 1–5 per workflow type.' },
+          { text: 'Key metric to track for each user: "% of generated images actually published to their Instagram/store." If this is below 20%, quality is the problem. If it\'s 0%, something else is wrong.', tag: 'critical' },
+          { text: 'Set up weekly check-in calls (15 min each, WhatsApp video). Ask: what worked, what didn\'t, what would make you pay for this.' },
+          { text: 'Fix critical bugs within 24 hours of report. For quality issues with specific garment types, retrain the LoRA with targeted data.' },
+          { text: 'Collect 2–3 case studies: brands who used your output and saw results (higher engagement, saved photographer cost). Get exact numbers. These become your sales material.' },
+          { text: 'Document the top 5 quality issues in order of frequency. These drive your final LoRA iteration before launch.' },
+        ]
+      },
+      {
+        label: 'Final LoRA Iteration',
+        tasks: [
+          { text: 'Based on beta feedback, identify the 3 garment categories with lowest quality scores. Collect 5,000 additional high-quality images for each. Retrain.' },
+          { text: 'Color accuracy is almost always the top complaint. If so: add a color correction post-processing step in all workflows using PIL to shift generated output toward reference color histogram.' },
+          { text: 'Run final quality benchmark: generate outputs for 50 standardized test products across all 5 workflow types. Grade each. Target: >80% graded A or B by a fashion-blind evaluator.' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'p8',
+    number: 'P–08',
+    title: 'Launch',
+    tagline: 'Go live with payments, start acquiring paying customers, and build the initial momentum.',
+    week: 'Weeks 12–13',
+    groups: [
+      {
+        label: 'Pre-Launch Checklist',
+        tasks: [
+          { text: 'Enable Stripe production mode and Paymob live keys. Test a real payment end-to-end with a real card. Confirm webhook delivery.', tag: 'critical' },
+          { text: 'Set up Sentry for error monitoring:', code: 'npm install @sentry/nextjs\nnpx @sentry/wizard@latest -i nextjs' },
+          { text: 'Set up PostHog for product analytics (posthog.com). Track: signup, store_connected, first_generation, generation_completed, subscription_started.' },
+          { text: 'Set up Uptime monitoring (Better Uptime or Checkly). Get alerted within 1 minute if the site goes down.' },
+          { text: 'Run a full load test: simulate 20 concurrent generation jobs. Ensure queue handles it without crashing. Tune worker concurrency.' },
+          { text: 'Legal: add Terms of Service, Privacy Policy, and a clear statement that AI-generated content is owned by the user (important for brands to know).' },
+          { text: 'Final UX pass: have someone unfamiliar with the product try to generate their first image without help. Fix every point of confusion.' },
+        ]
+      },
+      {
+        label: 'Marketing & Outreach',
+        tasks: [
+          { text: 'Create Instagram account for Stitch AI. Post 10 before/after examples from your beta (with brand permission). Format: side-by-side, phone photo → AI output. No text needed — let the results speak.' },
+          { text: 'Create a 60-second product demo video: screen recording of uploading a garment and getting studio shots + video in under 2 minutes. Post to Instagram Reels and TikTok.' },
+          { text: 'Direct outreach: DM 300 Egyptian fashion brands on Instagram. Short message in Arabic: "حولنا صورة منتجك لصورة احترافية في دقيقتين — مجاناً للأسبوع الأول. تجرب؟"' },
+          { text: 'Reach out to 10 Egyptian fashion/e-commerce influencers for partnership. Offer free subscription in exchange for honest review post.' },
+          { text: 'Post in: مجتمع متاجر مصر (Facebook group), #StartupEgypt community, any Egyptian e-commerce WhatsApp groups you can access.' },
+          { text: 'Email beta users: "We\'re officially live — here\'s your first month free as a thank-you for the beta." Ask them to refer one brand they know.' },
+          { text: 'Set up a WhatsApp Business number for inbound sales. When someone DMs your Instagram asking about pricing, send them your WhatsApp number and close the sale in conversation.' },
+        ]
+      },
+      {
+        label: 'First 20 Customers',
+        tasks: [
+          { text: 'Target: 20 paying customers by end of Week 13. Minimum viable: 10 paying customers with no churn for 30 days proves the model works.', tag: 'critical' },
+          { text: 'Offer the first 50 customers a founding member discount: 30% off for life if they pay for 3 months upfront. This gives you cash now and proves commitment.' },
+          { text: 'Track weekly: MRR, churn count, generation volume per user, % of outputs published (your north star metric). A user who generates but never publishes will churn.' },
+          { text: 'Weekly check-in: personally WhatsApp message every paying customer in month 1. "How\'s it going? Any issues?" This prevents silent churn and surfaces problems early.' },
+          { text: 'When you hit 20 paying customers, pause outbound sales and spend 2 weeks making those 20 customers extremely successful. Retention > acquisition at this stage.' },
+        ]
+      }
+    ]
+  }
+];
+
+// ─────────────────────────────────────
+// Render
+// ─────────────────────────────────────
+
+function getTaskId(phaseId, groupIdx, taskIdx) {
+  return `${phaseId}-g${groupIdx}-t${taskIdx}`;
+}
+
+function isDone(id) {
+  try { return localStorage.getItem(id) === '1'; } catch { return false; }
+}
+
+function setDone(id, val) {
+  try { localStorage.setItem(id, val ? '1' : '0'); } catch {}
+}
+
+function getPhaseProgress(phase) {
+  let total = 0, done = 0;
+  phase.groups.forEach((g, gi) => {
+    g.tasks.forEach((t, ti) => {
+      total++;
+      if (isDone(getTaskId(phase.id, gi, ti))) done++;
+    });
+  });
+  return { total, done };
+}
+
+function getTotalProgress() {
+  let total = 0, done = 0;
+  PHASES.forEach(p => {
+    const pp = getPhaseProgress(p);
+    total += pp.total;
+    done += pp.done;
+  });
+  return { total, done };
+}
+
+function updateGlobalProgress() {
+  const { total, done } = getTotalProgress();
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('overall-pct').textContent = pct + '%';
+  document.getElementById('overall-bar').style.width = pct + '%';
+  document.getElementById('total-tasks-display').textContent = total;
+  document.getElementById('done-tasks-display').textContent = done;
+
+  PHASES.forEach(p => {
+    const pp = getPhaseProgress(p);
+    const ppct = pp.total ? Math.round(pp.done / pp.total * 100) : 0;
+    const navItem = document.querySelector(`[data-phase="${p.id}"]`);
+    const phaseFill = document.querySelector(`[data-phase-fill="${p.id}"]`);
+    const phaseProgFill = document.querySelector(`[data-phase-prog-fill="${p.id}"]`);
+    const phaseProgLabel = document.querySelector(`[data-phase-prog-label="${p.id}"]`);
+
+    if (phaseFill) phaseFill.style.width = ppct + '%';
+    if (phaseProgFill) phaseProgFill.style.width = ppct + '%';
+    if (phaseProgLabel) phaseProgLabel.textContent = pp.done + '/' + pp.total;
+
+    if (navItem) {
+      navItem.classList.toggle('phase-done', pp.done === pp.total && pp.total > 0);
+    }
+  });
+}
+
+function toggleTask(phaseId, groupIdx, taskIdx) {
+  const id = getTaskId(phaseId, groupIdx, taskIdx);
+  const newVal = !isDone(id);
+  setDone(id, newVal);
+  const el = document.querySelector(`[data-task-id="${id}"]`);
+  if (el) el.classList.toggle('done', newVal);
+  updateGlobalProgress();
+}
+
+function buildSidebar() {
+  const nav = document.getElementById('sidebar-nav');
+  PHASES.forEach(p => {
+    const pp = getPhaseProgress(p);
+    const ppct = pp.total ? Math.round(pp.done / pp.total * 100) : 0;
+    const isDonePhase = pp.done === pp.total && pp.total > 0;
+
+    const a = document.createElement('a');
+    a.href = '#' + p.id;
+    a.className = 'nav-item' + (isDonePhase ? ' phase-done' : '');
+    a.dataset.phase = p.id;
+    a.innerHTML = `
+      <div class="nav-phase-badge">${p.number.split('–')[1]}</div>
+      <div class="nav-item-content">
+        <div class="nav-title">${p.title}</div>
+        <div class="nav-week">${p.week}</div>
+      </div>
+      <div class="nav-progress-mini">
+        <div class="nav-progress-fill" data-phase-fill="${p.id}" style="width:${ppct}%"></div>
+      </div>
+    `;
+    nav.appendChild(a);
+  });
+
+  // active state on scroll
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const active = document.querySelector(`[data-phase="${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.2 });
+
+  PHASES.forEach(p => {
+    const el = document.getElementById(p.id);
+    if (el) observer.observe(el);
+  });
+}
+
+function buildPhases() {
+  const container = document.getElementById('phases-container');
+
+  PHASES.forEach(p => {
+    const pp = getPhaseProgress(p);
+    const ppct = pp.total ? Math.round(pp.done / pp.total * 100) : 0;
+
+    const section = document.createElement('section');
+    section.className = 'phase';
+    section.id = p.id;
+
+    let tasksHTML = '';
+    p.groups.forEach((g, gi) => {
+      tasksHTML += `<div class="section-group"><div class="section-group-label">${g.label}</div><div class="task-list">`;
+      g.tasks.forEach((t, ti) => {
+        const id = getTaskId(p.id, gi, ti);
+        const done = isDone(id);
+        const tagHTML = t.tag ? `<span class="task-tag tag-${t.tag}">${t.tag}</span>` : '';
+        const codeHTML = t.code ? `<div class="task-code">${escHtml(t.code)}</div>` : '';
+        const noteHTML = t.note ? `<div class="task-note">${escHtml(t.note)}</div>` : '';
+
+        tasksHTML += `
+          <div class="task${done ? ' done' : ''}" data-task-id="${id}" onclick="toggleTask('${p.id}',${gi},${ti})">
+            <div class="task-check">
+              <svg class="task-check-icon" width="10" height="8" viewBox="0 0 10 8" fill="none">
+                <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="task-body">
+              <div class="task-text">${escHtml(t.text)}${tagHTML}</div>
+              ${codeHTML}${noteHTML}
+            </div>
+          </div>`;
+      });
+      tasksHTML += '</div></div>';
+    });
+
+    section.innerHTML = `
+      <div class="phase-header">
+        <div class="phase-number">${p.number}</div>
+        <div class="phase-meta">
+          <h2 class="phase-title">${p.title}</h2>
+          <p class="phase-tagline">${p.tagline}</p>
+        </div>
+        <div class="phase-right">
+          <span class="week-badge">${p.week}</span>
+          <div class="phase-prog-wrap">
+            <div class="phase-prog-bar">
+              <div class="phase-prog-fill" data-phase-prog-fill="${p.id}" style="width:${ppct}%"></div>
+            </div>
+            <span data-phase-prog-label="${p.id}">${pp.done}/${pp.total}</span>
+          </div>
+        </div>
+      </div>
+      ${tasksHTML}
+    `;
+
+    container.appendChild(section);
+  });
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toggleTheme() {
+  const root = document.documentElement;
+  const current = root.getAttribute('data-theme');
+  if (current === 'dark') root.setAttribute('data-theme','light');
+  else if (current === 'light') root.removeAttribute('data-theme');
+  else root.setAttribute('data-theme','dark');
+  try { localStorage.setItem('stitch-theme', root.getAttribute('data-theme') || 'system'); } catch {}
+}
+
+// Init
+try {
+  const saved = localStorage.getItem('stitch-theme');
+  if (saved && saved !== 'system') document.documentElement.setAttribute('data-theme', saved);
+} catch {}
+
+buildSidebar();
+buildPhases();
+updateGlobalProgress();
+</script>

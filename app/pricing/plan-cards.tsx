@@ -58,9 +58,9 @@ export function PlanCards({
           You are on the {paidPlan} plan.
         </p>
       ) : null}
-      <div className="mt-12 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-12 grid gap-5 overflow-visible py-3 sm:grid-cols-2 xl:grid-cols-4">
         {plans.map((plan) => (
-          <Card key={plan} className="flex flex-col p-6">
+          <Card key={plan} className="drape-plan-card flex flex-col p-6">
             <h2 className="text-2xl font-semibold capitalize">{plan}</h2>
             <p className="mt-7 text-4xl font-semibold">
               {PLAN_PRICE_EGP[plan]} EGP

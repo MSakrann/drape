@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { CreditsChip } from "@/components/credits-chip";
 import { EmptyState } from "@/components/empty-state";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -100,6 +101,7 @@ export default async function DashboardPage() {
           </section>
         </div>
       </main>
+      <SiteFooter />
     </>
   );
 }

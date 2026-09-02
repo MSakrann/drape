@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
 import { getUserId } from "@/lib/supabase/adapter";
@@ -132,6 +133,7 @@ export default async function ResultPage({
           )}
         </div>
       </main>
+      <SiteFooter />
     </>
   );
 }

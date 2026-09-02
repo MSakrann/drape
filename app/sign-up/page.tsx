@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -138,6 +139,7 @@ export default function SignUpPage() {
           </p>
         </Card>
       </main>
+      <SiteFooter />
     </>
   );
 }

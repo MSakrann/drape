@@ -39,7 +39,7 @@ const workflows = [
   },
   {
     title: "Video",
-    image: SAMPLE_PATHS[6],
+    video: "/samples/drape-13.mp4",
     blurb: "A 15-second vertical clip for Reels and TikTok.",
   },
   {
@@ -77,7 +77,7 @@ export default function Page() {
                     height={1000}
                     className="aspect-[4/5] w-full rounded-2xl object-cover"
                   />
-                  <p className="px-3 py-3 text-left text-sm uppercase tracking-wider text-[var(--drape-muted)]">
+                  <p className="px-3 py-3 text-left text-sm uppercase tracking-wide text-[var(--drape-muted)]">
                     {index === 0 ? "Input" : "Output"}
                   </p>
                 </Card>
@@ -87,14 +87,22 @@ export default function Page() {
         </section>
 
         <section aria-label="Fashion categories" className="overflow-hidden py-8">
-          <div className="flex w-max animate-[drape-marquee_30s_linear_infinite]">
-            {[...marqueeItems, ...marqueeItems].map((item, index) => (
-              <span
-                key={`${item}-${index}`}
-                className="px-7 text-sm font-bold uppercase tracking-wider text-[var(--drape-muted)]"
+          <div className="drape-marquee-track">
+            {[0, 1].map((copy) => (
+              <div
+                key={copy}
+                className="flex min-w-[100vw] shrink-0 items-center justify-around"
+                aria-hidden={copy === 1}
               >
-                {item}
-              </span>
+                {marqueeItems.map((item) => (
+                  <span
+                    key={`${copy}-${item}`}
+                    className="px-7 text-base font-semibold uppercase tracking-wide text-[var(--drape-muted)]"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
             ))}
           </div>
         </section>
@@ -111,13 +119,25 @@ export default function Page() {
                     index % 2 === 1 ? "md:order-2" : ""
                   }`}
                 >
-                  <Image
-                    src={workflow.image}
-                    alt={`${workflow.title} workflow`}
-                    width={1200}
-                    height={900}
-                    className="aspect-[4/3] w-full rounded-2xl object-cover"
-                  />
+                  {"video" in workflow && workflow.video ? (
+                    <video
+                      src={workflow.video}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      aria-label={`${workflow.title} workflow`}
+                      className="aspect-[4/3] w-full rounded-2xl object-cover"
+                    />
+                  ) : (
+                    <Image
+                      src={workflow.image}
+                      alt={`${workflow.title} workflow`}
+                      width={1200}
+                      height={900}
+                      className="aspect-[4/3] w-full rounded-2xl object-cover"
+                    />
+                  )}
                 </Card>
                 <div className="flex flex-col items-start gap-5">
                   <h2 className="text-4xl font-semibold uppercase tracking-tight md:text-6xl">
@@ -169,7 +189,16 @@ export default function Page() {
                   Pick Studio, Try-on, Lifestyle, Video, or Variants
                 </h3>
               </Card>
-              <Card className="flex min-h-full flex-col justify-end p-6">
+              <Card className="p-6">
+                <video
+                  src="/samples/drape-11.mp4"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  aria-label="Downloaded look posted as a short video"
+                  className="mb-6 aspect-square w-full rounded-2xl object-cover"
+                />
                 <p className="text-sm uppercase tracking-wider text-[var(--drape-accent)]">
                   Step 3
                 </p>
@@ -196,9 +225,9 @@ export default function Page() {
                 View pricing
               </Button>
             </div>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-10 grid gap-4 overflow-visible py-3 sm:grid-cols-2 lg:grid-cols-4">
               {plans.map((plan) => (
-                <Card key={plan} className="p-6">
+                <Card key={plan} className="drape-plan-card p-6">
                   <h3 className="text-xl font-semibold capitalize">{plan}</h3>
                   <p className="mt-5 text-4xl font-semibold">
                     {PLAN_PRICE_EGP[plan]} EGP

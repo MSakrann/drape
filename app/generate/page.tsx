@@ -5,6 +5,7 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { GenerationProgress } from "@/components/generation-progress";
 import { InsufficientCreditsModal } from "@/components/insufficient-credits-modal";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -397,6 +398,7 @@ export default function GeneratePage() {
           </div>
         </div>
       </main>
+      <SiteFooter />
 
       <InsufficientCreditsModal
         open={creditsModalOpen}

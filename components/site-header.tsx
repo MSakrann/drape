@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { createBrowserClient } from "@/lib/supabase/client";
 
 const navLinkClass =
-  "uppercase tracking-wider text-sm font-extrabold";
+  "uppercase tracking-wide text-base font-semibold transition-colors duration-200 hover:text-[var(--drape-accent)]";
 
 type SiteHeaderProps = {
   signedIn: boolean;
@@ -34,7 +34,11 @@ export function SiteHeader({ signedIn, credits, onSignOut }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-50 bg-[var(--drape-bg)] px-6 py-5 lg:px-[clamp(0.25rem,4vw,5rem)] lg:py-8">
       <div className="grid grid-cols-[1fr_auto] items-center gap-4 lg:grid-cols-[1fr_auto_1fr]">
-        <Link href="/" aria-label="Drape home" className="justify-self-start">
+        <Link
+          href="/"
+          aria-label="Drape home"
+          className="justify-self-start opacity-100 transition-opacity duration-200 hover:opacity-80"
+        >
           <Logo />
         </Link>
 
@@ -57,7 +61,7 @@ export function SiteHeader({ signedIn, credits, onSignOut }: SiteHeaderProps) {
 
         <button
           type="button"
-          className="justify-self-end size-10 rounded-xl bg-[var(--drape-accent)] text-[var(--drape-bg)] lg:hidden"
+          className="justify-self-end size-10 rounded-xl bg-[var(--drape-accent)] text-[var(--drape-bg)] transition-colors duration-200 hover:bg-[#F0EFED] lg:hidden"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((open) => !open)}

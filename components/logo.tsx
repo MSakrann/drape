@@ -5,9 +5,10 @@ export function Logo({ className }: { className?: string }) {
     <img
       src="/logo.svg"
       alt="Drape"
-      height={40}
+      width={160}
+      height={120}
       className={className}
-      style={{ height: 40, width: "auto" }}
+      style={{ width: 160, height: 120, objectFit: "contain" }}
     />
   );
 }

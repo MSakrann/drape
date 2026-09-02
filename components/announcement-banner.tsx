@@ -29,7 +29,7 @@ export function AnnouncementBanner({ message }: { message: string }) {
   if (!visible) return null;
 
   return (
-    <div className="flex items-center justify-center gap-4 bg-[var(--drape-surface)] px-6 py-3 text-center text-sm text-[var(--drape-accent)]">
+    <div className="flex items-center justify-center gap-4 bg-[var(--drape-surface)] px-6 py-3 text-center text-base text-[var(--drape-accent)]">
       <p>{message}</p>
       <button
         type="button"

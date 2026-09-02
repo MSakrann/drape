@@ -4,7 +4,7 @@ export function NodeTitle({ lines }: { lines: string[] }) {
       {lines.map((line, index) => (
         <span
           key={`${index}-${line}`}
-          className="bg-[var(--drape-accent)] text-[var(--drape-bg)] uppercase font-semibold tracking-tight px-4 py-2"
+          className="bg-[var(--drape-accent)] text-[var(--drape-bg)] uppercase font-semibold tracking-wide px-5 py-3 text-4xl leading-none md:text-6xl"
         >
           {line}
         </span>

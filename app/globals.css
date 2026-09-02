@@ -1,58 +1,10 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: Unique;
-  src: url("/fonts/Unique-Thin.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 100;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: Unique;
-  src: url("/fonts/Unique-ExtraLight.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 200;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: Unique;
-  src: url("/fonts/Unique-Light.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: Unique;
-  src: url("/fonts/Unique-Regular.woff2") format("woff2");
+  font-family: Galant;
+  src: url("/fonts/Galant.ttf") format("truetype");
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: Unique;
-  src: url("/fonts/Unique-Medium.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: Unique;
-  src: url("/fonts/Unique-SemiBold.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: Unique;
-  src: url("/fonts/Unique-Bold.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 700;
   font-display: swap;
 }
 
@@ -69,7 +21,10 @@
 body {
   background: var(--drape-bg);
   color: var(--drape-text);
-  font-family: Unique, sans-serif;
+  font-family: Galant, Georgia, serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
 }
 
 @keyframes drape-marquee {
@@ -78,6 +33,35 @@ body {
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+.drape-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: drape-marquee 40s linear infinite;
+}
+
+.drape-plan-card {
+  position: relative;
+  transition:
+    transform 280ms ease,
+    border-color 280ms ease,
+    box-shadow 280ms ease;
+}
+
+.drape-plan-card:hover {
+  z-index: 1;
+  transform: scale(1.05);
+  border-color: var(--drape-accent);
+  box-shadow: 0 22px 48px -18px rgb(62 201 168 / 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drape-plan-card,
+  .drape-plan-card:hover {
+    transition: border-color 280ms ease, box-shadow 280ms ease;
+    transform: none;
   }
 }
 

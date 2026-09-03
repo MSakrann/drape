@@ -8,6 +8,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon\\.ico|samples|fonts|logo\\.svg).*)",
+    "/((?!_next/static|_next/image|favicon\\.ico|favicon\\.svg|apple-touch-icon\\.png|icon\\.svg|samples|fonts|logo\\.svg|logo-5-transparent\\.svg|logo-transparent\\.svg|lumora\\.html).*)",
   ],
 };

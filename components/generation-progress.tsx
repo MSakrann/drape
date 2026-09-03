@@ -7,7 +7,7 @@ export function GenerationProgress({
 }) {
   return (
     <div aria-live="polite">
-      <p className="text-sm font-bold uppercase tracking-wider text-[var(--drape-accent)]">
+      <p className="text-sm font-medium text-[var(--drape-accent)]">
         {stages[activeIndex]}
       </p>
       <ol className="mt-4 grid gap-2 sm:grid-cols-3">

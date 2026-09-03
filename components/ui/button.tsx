@@ -1,42 +1,58 @@
 import Link from "next/link";
 
 const base =
-  "inline-flex items-center justify-center rounded-2xl h-12 px-7 text-base uppercase tracking-wide font-bold [font-synthesis:weight] transition-colors duration-200";
+  "drape-chip disabled:pointer-events-none disabled:opacity-50";
 
-const variants = {
-  primary:
-    "bg-[var(--drape-accent)] text-[var(--drape-bg)] hover:bg-[#F0EFED]",
-  outline:
-    "border border-[var(--drape-accent)] text-[var(--drape-accent)] hover:bg-[var(--drape-accent)] hover:text-[var(--drape-bg)]",
-} as const;
+const ArrowIcon = () => (
+  <svg
+    className="drape-chip-arrow"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M7 17 17 7M8 7h9v9" />
+  </svg>
+);
 
 type ButtonProps = {
   variant?: "primary" | "outline";
   href?: string;
   className?: string;
+  arrow?: boolean;
   children?: React.ReactNode;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export function Button({
-  variant = "primary",
+  variant: _variant = "primary",
   href,
   className,
+  arrow = true,
   children,
   ...props
 }: ButtonProps) {
-  const classes = [base, variants[variant], className].filter(Boolean).join(" ");
+  const classes = [base, className].filter(Boolean).join(" ");
+  const content = (
+    <>
+      {children}
+      {arrow ? <ArrowIcon /> : null}
+    </>
+  );
 
   if (href) {
     return (
       <Link href={href} className={classes}>
-        {children}
+        {content}
       </Link>
     );
   }
 
   return (
     <button className={classes} {...props}>
-      {children}
+      {content}
     </button>
   );
 }

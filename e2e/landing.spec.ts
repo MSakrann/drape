@@ -1,11 +1,13 @@
 import { test, expect } from "@playwright/test";
 
-test("landing loads hero copy", async ({ page }) => {
+test("landing loads Drape hero copy", async ({ page }) => {
   await page.goto("/");
+  await expect(page).toHaveTitle("Drape");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Studio product photos",
+    "Bold ideas",
+    { timeout: 15_000 },
   );
   await expect(
-    page.getByRole("link", { name: /get started for free/i }),
+    page.getByRole("link", { name: /start a project/i }).first(),
   ).toBeVisible();
 });

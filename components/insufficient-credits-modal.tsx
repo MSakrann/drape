@@ -35,7 +35,7 @@ export function InsufficientCreditsModal({
       >
         <h2
           id="insufficient-credits-title"
-          className="text-3xl font-semibold uppercase tracking-tight"
+          className="text-3xl font-semibold tracking-tight"
         >
           Not enough credits.
         </h2>
@@ -44,7 +44,7 @@ export function InsufficientCreditsModal({
         </p>
         <div className="mt-7 flex flex-wrap gap-3">
           <Button href="/pricing">View pricing</Button>
-          <Button variant="outline" type="button" onClick={onClose}>
+          <Button variant="outline" type="button" arrow={false} onClick={onClose}>
             Close
           </Button>
         </div>

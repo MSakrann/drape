@@ -3,7 +3,7 @@ export function Logo({ className }: { className?: string }) {
     // Native img keeps SVG simple in Next.js 15 (no next/image width/height/unoptimized dance).
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/logo.svg"
+      src="/logo-5-transparent.svg"
       alt="Drape"
       width={160}
       height={120}

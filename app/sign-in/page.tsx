@@ -10,8 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { createBrowserClient } from "@/lib/supabase/client";
 
-const inputClass =
-  "mt-2 h-12 w-full rounded-2xl border border-white/12 bg-[var(--drape-bg)] px-4 text-[var(--drape-text)]";
+const inputClass = "drape-input";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -50,15 +49,15 @@ export default function SignInPage() {
       <SiteHeader signedIn={false} />
       <main className="px-6 py-16">
         <Card className="mx-auto max-w-lg p-7 sm:p-10">
-          <p className="text-sm uppercase tracking-wider text-[var(--drape-accent)]">
+          <p className="text-sm font-medium text-[var(--drape-accent)]">
             Welcome back
           </p>
-          <h1 className="mt-4 text-4xl font-semibold uppercase tracking-tight">
+          <h1 className="mt-4 text-4xl font-semibold tracking-tight">
             Sign in
           </h1>
 
           <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-            <label className="block text-sm font-bold uppercase tracking-wider">
+            <label className="block text-xs font-medium uppercase tracking-wide text-[var(--drape-dim)]">
               Email
               <input
                 className={inputClass}
@@ -70,7 +69,7 @@ export default function SignInPage() {
               />
             </label>
 
-            <label className="block text-sm font-bold uppercase tracking-wider">
+            <label className="block text-xs font-medium uppercase tracking-wide text-[var(--drape-dim)]">
               Password
               <input
                 className={inputClass}
@@ -96,7 +95,7 @@ export default function SignInPage() {
 
           <p className="mt-6 text-center text-[var(--drape-muted)]">
             New to Drape?{" "}
-            <Link className="font-bold text-[var(--drape-accent)]" href="/sign-up">
+            <Link className="font-medium text-[var(--drape-accent)]" href="/sign-up">
               Create an account
             </Link>
           </p>

@@ -43,10 +43,10 @@ export default async function PricingPage() {
       <main className="px-6 py-16 lg:px-10">
         <section className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
-            <p className="text-sm uppercase tracking-wider text-[var(--drape-accent)]">
+            <p className="text-sm font-medium text-[var(--drape-accent)]">
               Pricing
             </p>
-            <h1 className="mt-4 text-5xl font-semibold uppercase tracking-tight md:text-7xl">
+            <h1 className="mt-4 text-5xl font-semibold tracking-tight md:text-7xl">
               Credits that fit your studio
             </h1>
             <p className="mt-6 text-xl text-[var(--drape-muted)]">
@@ -60,7 +60,7 @@ export default async function PricingPage() {
           />
 
           <section className="mt-20">
-            <h2 className="text-3xl font-semibold uppercase tracking-tight md:text-5xl">
+            <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
               Credit costs
             </h2>
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

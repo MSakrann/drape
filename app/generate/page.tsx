@@ -29,8 +29,7 @@ type GenerationResponse = {
   status: GenerationStatus;
 };
 
-const optionButtonClass =
-  "rounded-2xl border px-4 py-3 text-left text-sm font-bold uppercase tracking-wider transition-colors";
+const optionButtonClass = "drape-chip";
 
 function wait(ms: number, signal: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -208,10 +207,10 @@ export default function GeneratePage() {
       <SiteHeader signedIn credits={balance} />
       <main className="px-6 py-10 lg:px-10 lg:py-14">
         <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-bold uppercase tracking-wider text-[var(--drape-accent)]">
+          <p className="text-sm font-medium text-[var(--drape-accent)]">
             Generate
           </p>
-          <h1 className="mt-3 text-4xl font-semibold uppercase tracking-tight md:text-6xl">
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-6xl">
             Create your campaign
           </h1>
 
@@ -226,11 +225,7 @@ export default function GeneratePage() {
                 type="button"
                 role="tab"
                 aria-selected={workflow === tab.workflow}
-                className={`shrink-0 rounded-full px-5 py-3 text-sm font-bold uppercase tracking-wider ${
-                  workflow === tab.workflow
-                    ? "bg-[var(--drape-accent)] text-[var(--drape-bg)]"
-                    : "border border-white/12 text-[var(--drape-muted)]"
-                }`}
+                className="drape-chip shrink-0"
                 onClick={() => selectWorkflow(tab.workflow)}
               >
                 {tab.label}
@@ -240,7 +235,7 @@ export default function GeneratePage() {
 
           <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
             <Card className="p-6 sm:p-8">
-              <h2 className="text-2xl font-semibold uppercase tracking-tight">
+              <h2 className="text-2xl font-semibold tracking-tight">
                 Upload product
               </h2>
               <label className="mt-6 flex min-h-64 cursor-pointer flex-col items-center justify-center rounded-[1.25em] border border-dashed border-white/25 bg-white/[0.03] p-8 text-center">
@@ -269,7 +264,7 @@ export default function GeneratePage() {
             </Card>
 
             <Card className="p-6 sm:p-8">
-              <h2 className="text-2xl font-semibold uppercase tracking-tight">
+              <h2 className="text-2xl font-semibold tracking-tight">
                 {WORKFLOW_TABS.find((tab) => tab.workflow === workflow)?.label} options
               </h2>
               <div className="mt-6">
@@ -280,11 +275,8 @@ export default function GeneratePage() {
                       {WORKFLOW_OPTIONS.studio.map((option) => (
                         <label
                           key={option}
-                          className={`${optionButtonClass} ${
-                            studioBackground === option
-                              ? "border-[var(--drape-accent)] text-[var(--drape-accent)]"
-                              : "border-white/12 text-[var(--drape-muted)]"
-                          }`}
+                          className={optionButtonClass}
+                          data-active={studioBackground === option}
                         >
                           <input
                             className="sr-only"
@@ -308,11 +300,7 @@ export default function GeneratePage() {
                         key={option}
                         type="button"
                         aria-pressed={model === option}
-                        className={`${optionButtonClass} ${
-                          model === option
-                            ? "border-[var(--drape-accent)] text-[var(--drape-accent)]"
-                            : "border-white/12 text-[var(--drape-muted)]"
-                        }`}
+                        className={optionButtonClass}
                         onClick={() => setModel(option)}
                       >
                         {option}
@@ -322,10 +310,10 @@ export default function GeneratePage() {
                 ) : null}
 
                 {workflow === "lifestyle" ? (
-                  <label className="block text-sm font-bold uppercase tracking-wider">
+                  <label className="block text-xs font-medium uppercase tracking-wide text-[var(--drape-dim)]">
                     Scene
                     <select
-                      className="mt-2 h-12 w-full rounded-2xl border border-white/12 bg-[var(--drape-bg)] px-4 text-[var(--drape-text)]"
+                      className="drape-input"
                       value={lifestyle}
                       onChange={(event) => setLifestyle(event.target.value)}
                     >
@@ -339,8 +327,8 @@ export default function GeneratePage() {
                 ) : null}
 
                 {workflow === "video" ? (
-                  <div className="rounded-2xl border border-white/12 bg-[var(--drape-bg)] px-4 py-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[var(--drape-dim)]">
+                  <div className="rounded-[0.875rem] border border-white/12 bg-[var(--drape-bg)] px-4 py-3">
+                    <span className="text-xs font-medium uppercase tracking-wide text-[var(--drape-dim)]">
                       Duration
                     </span>
                     <p className="mt-1 text-lg">15 seconds</p>
@@ -354,11 +342,7 @@ export default function GeneratePage() {
                         key={color}
                         type="button"
                         aria-pressed={variantColors.includes(color)}
-                        className={`${optionButtonClass} ${
-                          variantColors.includes(color)
-                            ? "border-[var(--drape-accent)] text-[var(--drape-accent)]"
-                            : "border-white/12 text-[var(--drape-muted)]"
-                        }`}
+                        className={optionButtonClass}
                         onClick={() => toggleVariant(color)}
                       >
                         {color}

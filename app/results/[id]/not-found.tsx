@@ -9,7 +9,7 @@ export default function GenerationNotFound() {
       <SiteHeader signedIn={false} />
       <main className="px-6 py-20 lg:px-10">
         <Card className="mx-auto max-w-2xl p-8 text-center sm:p-12">
-          <h1 className="text-4xl font-semibold uppercase tracking-tight">
+          <h1 className="text-4xl font-semibold tracking-tight">
             Generation not found.
           </h1>
           <Button href="/dashboard" variant="outline" className="mt-8">

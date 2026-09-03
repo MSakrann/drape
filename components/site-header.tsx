@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { createBrowserClient } from "@/lib/supabase/client";
 
 const navLinkClass =
-  "uppercase tracking-wide text-base font-semibold transition-colors duration-200 hover:text-[var(--drape-accent)]";
+  "text-sm font-medium text-[#F0EFED]/80 transition-colors duration-200 hover:text-[var(--drape-accent)]";
 
 type SiteHeaderProps = {
   signedIn: boolean;
@@ -17,7 +16,6 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({ signedIn, credits, onSignOut }: SiteHeaderProps) {
-  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
   function closeMenu() {
@@ -28,24 +26,24 @@ export function SiteHeader({ signedIn, credits, onSignOut }: SiteHeaderProps) {
     const supabase = createBrowserClient();
     await supabase.auth.signOut();
     onSignOut?.();
-    router.push("/");
+    window.location.assign("/");
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--drape-bg)] px-6 py-5 lg:px-[clamp(0.25rem,4vw,5rem)] lg:py-8">
+    <header className="sticky top-0 z-50 bg-[var(--drape-bg)] px-6 py-4 lg:px-[clamp(0.25rem,4vw,5rem)]">
       <div className="grid grid-cols-[1fr_auto] items-center gap-4 lg:grid-cols-[1fr_auto_1fr]">
-        <Link
+        <a
           href="/"
           aria-label="Drape home"
           className="justify-self-start opacity-100 transition-opacity duration-200 hover:opacity-80"
         >
           <Logo />
-        </Link>
+        </a>
 
         <nav className="hidden items-center gap-8 lg:flex">
-          <Link href="/#workflows" className={navLinkClass}>
+          <a href="/#works" className={navLinkClass}>
             Product
-          </Link>
+          </a>
           <Link href="/pricing" className={navLinkClass}>
             Pricing
           </Link>
@@ -61,7 +59,7 @@ export function SiteHeader({ signedIn, credits, onSignOut }: SiteHeaderProps) {
 
         <button
           type="button"
-          className="justify-self-end size-10 rounded-xl bg-[var(--drape-accent)] text-[var(--drape-bg)] transition-colors duration-200 hover:bg-[#F0EFED] lg:hidden"
+          className="justify-self-end inline-flex size-10 items-center justify-center rounded-[0.875rem] border border-white/18 bg-white/8 text-[#F0EFED] transition-colors duration-200 hover:bg-white/16 lg:hidden"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((open) => !open)}
@@ -72,9 +70,9 @@ export function SiteHeader({ signedIn, credits, onSignOut }: SiteHeaderProps) {
 
       {menuOpen ? (
         <div className="mt-5 flex flex-col gap-4 border-t border-white/12 pt-5 lg:hidden">
-          <Link href="/#workflows" className={navLinkClass} onClick={closeMenu}>
+          <a href="/#works" className={navLinkClass} onClick={closeMenu}>
             Product
-          </Link>
+          </a>
           <Link href="/pricing" className={navLinkClass} onClick={closeMenu}>
             Pricing
           </Link>
@@ -87,6 +85,7 @@ export function SiteHeader({ signedIn, credits, onSignOut }: SiteHeaderProps) {
               <Button
                 variant="outline"
                 type="button"
+                arrow={false}
                 onClick={() => {
                   void handleSignOut();
                   closeMenu();
@@ -131,7 +130,7 @@ function SignedInActions({
     <>
       <Button href="/dashboard">Dashboard</Button>
       <p className={navLinkClass}>{credits} credits</p>
-      <Button variant="outline" type="button" onClick={() => onSignOut?.()}>
+      <Button variant="outline" type="button" arrow={false} onClick={() => onSignOut?.()}>
         Sign out
       </Button>
     </>

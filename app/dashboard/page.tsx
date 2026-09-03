@@ -68,10 +68,10 @@ export default async function DashboardPage() {
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-bold uppercase tracking-wider text-[var(--drape-accent)]">
+              <p className="text-sm font-medium text-[var(--drape-accent)]">
                 Dashboard
               </p>
-              <h1 className="mt-3 text-4xl font-semibold uppercase tracking-tight md:text-6xl">
+              <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-6xl">
                 Recent generations
               </h1>
               <div className="mt-5">
@@ -126,7 +126,7 @@ function GenerationCard({ generation }: { generation: Generation }) {
               generation.status === "running" ? "animate-pulse" : ""
             }`}
           >
-            <span className="text-sm font-bold uppercase tracking-wider text-[var(--drape-dim)]">
+            <span className="text-sm font-medium text-[var(--drape-dim)]">
               {generation.status === "running" ? "Generating…" : "No output"}
             </span>
           </div>
@@ -143,7 +143,7 @@ function GenerationCard({ generation }: { generation: Generation }) {
             }).format(new Date(generation.created_at))}
           </p>
         </div>
-        <span className="text-xs font-bold uppercase tracking-wider text-[var(--drape-accent)]">
+        <span className="text-xs font-medium uppercase tracking-wide text-[var(--drape-accent)]">
           {generation.status}
         </span>
       </div>

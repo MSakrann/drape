@@ -70,12 +70,12 @@ export default async function ResultPage({
       <SiteHeader signedIn credits={profileResult.data.credits} />
       <main className="px-6 py-12 lg:px-10 lg:py-16">
         <div className="mx-auto max-w-7xl">
-          <p className="text-sm font-bold uppercase tracking-wider text-[var(--drape-accent)]">
+          <p className="text-sm font-medium text-[var(--drape-accent)]">
             Results
           </p>
           <div className="mt-3 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h1 className="text-4xl font-semibold uppercase tracking-tight md:text-6xl">
+              <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
                 {WORKFLOW_LABELS[generation.workflow]} generation
               </h1>
               <p className="mt-4 text-[var(--drape-muted)]">
@@ -110,7 +110,7 @@ export default async function ResultPage({
                     </div>
                   </a>
                   <div className="flex items-center justify-between gap-4 px-3 py-4">
-                    <span className="text-sm font-bold uppercase tracking-wider text-[var(--drape-muted)]">
+                    <span className="text-sm font-medium text-[var(--drape-muted)]">
                       {generation.workflow === "video"
                         ? "Video preview (mock)"
                         : `Output ${index + 1}`}
@@ -118,7 +118,7 @@ export default async function ResultPage({
                     <a
                       href={path}
                       download
-                      className="text-sm font-bold uppercase tracking-wider text-[var(--drape-accent)]"
+                      className="text-sm font-medium text-[var(--drape-accent)]"
                     >
                       Download
                     </a>

@@ -8,7 +8,7 @@ export default function PrivacyPage() {
       <SiteHeader signedIn={false} />
       <main className="px-6 py-16 lg:px-10">
         <section className="mx-auto max-w-4xl">
-          <h1 className="text-5xl font-semibold uppercase tracking-tight md:text-7xl">
+          <h1 className="text-5xl font-semibold tracking-tight md:text-7xl">
             Privacy
           </h1>
           <Card className="mt-10 space-y-5 p-8 text-lg text-[var(--drape-muted)]">

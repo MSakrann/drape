@@ -34,6 +34,21 @@ function authenticatedClient(extra: object = {}) {
   };
 }
 
+function catalogForm(fields: { background?: string; cutout?: File | string } = {}) {
+  const form = new FormData();
+  if (fields.background !== undefined) {
+    form.set("background", fields.background);
+  }
+  if (fields.cutout !== undefined) {
+    form.set("cutout", fields.cutout);
+  }
+  return form;
+}
+
+const pngCutout = new File([Uint8Array.from([137, 80, 78, 71])], "cutout.png", {
+  type: "image/png",
+});
+
 describe("POST /api/generate", () => {
   beforeEach(() => {
     createServerClientMock.mockReset();
@@ -48,7 +63,7 @@ describe("POST /api/generate", () => {
     const response = await generate(
       new Request("http://localhost/api/generate", {
         method: "POST",
-        body: JSON.stringify({ workflow: "studio" }),
+        body: catalogForm({ background: "white", cutout: pngCutout }),
       }),
     );
 
@@ -56,33 +71,58 @@ describe("POST /api/generate", () => {
     expect(executeGenerateMock).not.toHaveBeenCalled();
   });
 
-  it("returns 400 for malformed JSON", async () => {
+  it("returns 400 for an invalid background", async () => {
     createServerClientMock.mockResolvedValue(authenticatedClient());
 
     const response = await generate(
       new Request("http://localhost/api/generate", {
         method: "POST",
-        body: "{",
+        body: catalogForm({ background: "beige", cutout: pngCutout }),
       }),
     );
 
     expect(response.status).toBe(400);
-    expect(await response.json()).toEqual({ message: "Invalid JSON body." });
+    expect(await response.json()).toEqual({ message: "Invalid background." });
+    expect(executeGenerateMock).not.toHaveBeenCalled();
   });
 
-  it("returns 400 for an unknown workflow", async () => {
+  it("returns 400 when cutout is missing", async () => {
     createServerClientMock.mockResolvedValue(authenticatedClient());
 
     const response = await generate(
       new Request("http://localhost/api/generate", {
         method: "POST",
-        body: JSON.stringify({ workflow: "unknown" }),
+        body: catalogForm({ background: "white" }),
       }),
     );
 
     expect(response.status).toBe(400);
-    expect(await response.json()).toEqual({ message: "Invalid workflow." });
+    expect(await response.json()).toEqual({ message: "Invalid cutout." });
     expect(executeGenerateMock).not.toHaveBeenCalled();
+  });
+
+  it("parses multipart and calls executeGenerate for studio", async () => {
+    createServerClientMock.mockResolvedValue(authenticatedClient());
+    executeGenerateMock.mockResolvedValue({
+      ok: true,
+      id: "job-1",
+      outputPaths: ["a", "b", "c"],
+      creditsUsed: 1,
+    });
+
+    const response = await generate(
+      new Request("http://localhost/api/generate", {
+        method: "POST",
+        body: catalogForm({ background: "grey", cutout: pngCutout }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(executeGenerateMock).toHaveBeenCalled();
+    const [, input] = executeGenerateMock.mock.calls[0] as [unknown, { workflow: string; background: string; cutoutPng: Buffer }];
+    expect(input.workflow).toBe("studio");
+    expect(input.background).toBe("grey");
+    expect(Buffer.isBuffer(input.cutoutPng)).toBe(true);
   });
 });
 

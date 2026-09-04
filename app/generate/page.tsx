@@ -114,9 +114,7 @@ export default function GeneratePage() {
 
     const controller = new AbortController();
     let timeout: number | undefined;
-    const progress = window.setInterval(() => {
-      setActiveIndex((index) => Math.min(index + 1, stages.length - 1));
-    }, 1_500);
+    let progress: number | undefined;
 
     setGenerating(true);
     setActiveIndex(0);
@@ -136,8 +134,6 @@ export default function GeneratePage() {
         return;
       }
 
-      setActiveIndex((index) => Math.max(index, 1));
-
       const form = new FormData();
       form.set("background", studioBackground);
       form.set(
@@ -146,6 +142,11 @@ export default function GeneratePage() {
           type: cutout.type || "image/png",
         }),
       );
+
+      setActiveIndex(1);
+      progress = window.setInterval(() => {
+        setActiveIndex((index) => Math.min(index + 1, stages.length - 1));
+      }, 1_500);
 
       timeout = window.setTimeout(() => controller.abort(), 30_000);
       const response = await fetch("/api/generate", {
@@ -173,7 +174,9 @@ export default function GeneratePage() {
       if (timeout !== undefined) {
         window.clearTimeout(timeout);
       }
-      window.clearInterval(progress);
+      if (progress !== undefined) {
+        window.clearInterval(progress);
+      }
       if (mounted.current) {
         setGenerating(false);
       }

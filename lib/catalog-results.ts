@@ -1,7 +1,13 @@
-import { CATALOG_SIZES, type CatalogPreset } from "./catalog-pack";
+import {
+  CATALOG_OUTPUT_NAMES,
+  CATALOG_SIZES,
+  type CatalogPreset,
+} from "./catalog-pack";
 import type { Workflow } from "./types";
 
-const CATALOG_PRESET_ORDER: CatalogPreset[] = ["shop", "story", "whatsapp"];
+const CATALOG_PRESET_ORDER = Object.keys(
+  CATALOG_OUTPUT_NAMES,
+) as CatalogPreset[];
 
 const CATALOG_SLOT_DISPLAY_NAMES: Record<CatalogPreset, string> = {
   shop: "Shop",

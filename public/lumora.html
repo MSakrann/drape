@@ -157,6 +157,7 @@
     .eyebrow.light .eyebrow-dot { background: rgba(255,255,255,.6) }
     .eyebrow.chip { border: 1px solid rgba(240,239,237,.18); border-radius: 9999px; padding: .375rem 1rem }
     .hero-h1 { max-width: 18ch; font-size: 2.25rem; font-weight: 600; line-height: 1.18; letter-spacing: -.02em; color: #F0EFED; text-shadow: 0 2px 22px rgba(18,25,27,.4) }
+    .hero-sub { max-width: 28ch; font-size: 1.05rem; font-weight: 500; line-height: 1.5; color: rgba(240,239,237,.75) }
     .line { display: block; overflow: hidden; padding-bottom: 0.2em; margin-bottom: -0.12em }
     .line > span { display: block; transform: translateY(100%); opacity: 0; transition: transform 900ms var(--ease-out-cubic), opacity 900ms var(--ease-out-cubic) }
     .line.revealed > span { transform: none; opacity: 1 }
@@ -640,6 +641,7 @@
             <span class="line"><span>shipped with</span></span>
             <span class="line"><span>quiet precision.</span></span>
           </h1>
+          <p class="hero-sub fade-up" data-hero-delay="500">Studio catalog photos from a phone shot — Shop, Story, and WhatsApp.</p>
           <div class="cta-row fade-up" data-hero-delay="650">
             <span class="pill-wrap"><a class="pill dark with-arrow" href="/sign-up" data-auth-guest-href="/sign-up" data-auth-user-href="/generate">Start a project<span class="pill-badge right"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></span>
             <span class="pill-wrap"><button class="pill outline no-arrow" type="button" data-scroll="works">View Work</button></span>
@@ -759,10 +761,10 @@
           <li class="reveal reveal-y48" data-delay="90">
             <a class="work-link" href="#works">
               <article class="work-card">
-                <img class="work-media" src="/samples/drape-5.jpg" alt="Try-on on a model" />
+                <img class="work-media" src="/samples/drape-5.jpg" alt="Shop catalog square" />
                 <div class="work-shade"></div>
-                <div class="work-meta"><span>Try-on</span><span class="work-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
-                <div class="work-bottom"><h3>Try-on</h3><p>See the garment on model references, hijab or not.</p><div class="tags"><span class="tag">Try-on</span><span class="tag">Model</span></div></div>
+                <div class="work-meta"><span>Shop</span><span class="work-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
+                <div class="work-bottom"><h3>Shop</h3><p>A square catalog shot for Instagram and Jumia from one phone photo.</p><div class="tags"><span class="tag">Shop</span><span class="tag">1080</span></div></div>
               </article>
             </a>
           </li>
@@ -779,10 +781,10 @@
           <li class="reveal reveal-y48" data-delay="270">
             <a class="work-link" href="#works">
               <article class="work-card">
-                <video class="work-media" src="/samples/drape-13.mp4" autoplay muted loop playsinline aria-label="Video workflow"></video>
+                <video class="work-media" src="/samples/drape-13.mp4" autoplay muted loop playsinline aria-label="Story catalog crop"></video>
                 <div class="work-shade"></div>
-                <div class="work-meta"><span>Video</span><span class="work-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
-                <div class="work-bottom"><h3>Video</h3><p>A 15-second vertical clip for Reels and TikTok.</p><div class="tags"><span class="tag">Video</span><span class="tag">Reels</span></div></div>
+                <div class="work-meta"><span>Story</span><span class="work-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
+                <div class="work-bottom"><h3>Story</h3><p>A vertical catalog crop for Instagram Stories and WhatsApp.</p><div class="tags"><span class="tag">Story</span><span class="tag">WhatsApp</span></div></div>
               </article>
             </a>
           </li>
@@ -801,13 +803,13 @@
             <a class="svc-link" href="#service-studio"><div class="svc-row"><span class="svc-idx">01</span><h3>Studio images and stills</h3><p class="svc-desc">Our AI analyzes your brand guidelines and generates clean studio images in a click of a button.</p><span class="svc-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div></a>
           </li>
           <li class="svc-item reveal reveal-y24" data-delay="80" id="service-try-on">
-            <a class="svc-link" href="#service-try-on"><div class="svc-row"><span class="svc-idx">02</span><h3>Try on images and stills</h3><p class="svc-desc">Showcase your fashion items on a model of your selection.</p><span class="svc-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div></a>
+            <a class="svc-link" href="#service-try-on"><div class="svc-row"><span class="svc-idx">02</span><h3>Shop square stills</h3><p class="svc-desc">Export a 1080 square for Instagram and Jumia from the same phone shot.</p><span class="svc-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div></a>
           </li>
           <li class="svc-item reveal reveal-y24" data-delay="160" id="service-lifestyle">
             <a class="svc-link" href="#service-lifestyle"><div class="svc-row"><span class="svc-idx">03</span><h3>Lifestyle images and stills</h3><p class="svc-desc">Showcase your products in any place of your selection, the river Nile, the pyramids or any place you prefer.</p><span class="svc-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div></a>
           </li>
           <li class="svc-item reveal reveal-y24" data-delay="240" id="service-video">
-            <a class="svc-link" href="#service-video"><div class="svc-row"><span class="svc-idx">04</span><h3>Video generation</h3><p class="svc-desc">Our AI can generate short, converting reels from images.</p><span class="svc-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div></a>
+            <a class="svc-link" href="#service-video"><div class="svc-row"><span class="svc-idx">04</span><h3>Story and WhatsApp stills</h3><p class="svc-desc">Cut the same catalog photo into Story and WhatsApp sizes in one pack.</p><span class="svc-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div></a>
           </li>
           <li class="svc-item reveal reveal-y24" data-delay="320" id="service-variants">
             <a class="svc-link" href="#service-variants"><div class="svc-row"><span class="svc-idx">05</span><h3>Variants</h3><p class="svc-desc">Apply your product variations to the generated outputs.</p><span class="svc-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div></a>
@@ -888,9 +890,9 @@
           <p class="col-title">Services</p>
           <ul class="col-links">
             <li><a class="anim-link" href="#service-studio"><span>Studio</span></a></li>
-            <li><a class="anim-link" href="#service-try-on"><span>Try-on</span></a></li>
+            <li><a class="anim-link" href="#service-try-on"><span>Shop</span></a></li>
             <li><a class="anim-link" href="#service-lifestyle"><span>Lifestyle</span></a></li>
-            <li><a class="anim-link" href="#service-video"><span>Video</span></a></li>
+            <li><a class="anim-link" href="#service-video"><span>Story</span></a></li>
             <li><a class="anim-link" href="#service-variants"><span>Variants</span></a></li>
           </ul>
         </div>
@@ -1137,7 +1139,7 @@
 
     const aboutWords = document.getElementById('aboutWords');
     const aboutLead = 'We understand your brand guidelines ';
-    const aboutMuted = 'and we showcase your fashion products in a cinematic way.';
+    const aboutMuted = 'and we turn a phone shot into Shop, Story, and WhatsApp stills.';
     function splitWords(text, muted) {
       return text.split(' ').map((w, i, arr) => {
         const span = document.createElement('span');
@@ -1173,7 +1175,7 @@
     const CARDS = [
       { caption: 'Conversion design', title: 'Crafted to convert.' },
       { caption: 'Studio', title: 'Clean white-studio product shots from a handheld photo.' },
-      { caption: 'Try-on', title: 'See the garment on model references, hijab or not.' },
+      { caption: 'Catalog', title: 'Studio catalog photos from a phone shot — Shop, Story, and WhatsApp.' },
       { caption: 'Lifestyle', title: 'Place the piece in Cairo interiors, the Nile, or the street.' },
     ];
     let cardIndex = 0;

@@ -16,7 +16,8 @@ import {
   WORKFLOW_TABS,
   validateUpload,
 } from "@/lib/generate-page";
-import type { GenerationStatus, Plan, Workflow } from "@/lib/types";
+import { removeBackground } from "@/lib/remove-background";
+import type { Plan, Workflow } from "@/lib/types";
 
 type MeResponse = {
   credits: number;
@@ -24,33 +25,16 @@ type MeResponse = {
   email: string;
 };
 
-type GenerationResponse = {
-  id: string;
-  status: GenerationStatus;
-};
-
 const optionButtonClass = "drape-chip";
-
-function wait(ms: number, signal: AbortSignal): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const timeout = window.setTimeout(() => {
-      signal.removeEventListener("abort", abort);
-      resolve();
-    }, ms);
-    const abort = () => {
-      window.clearTimeout(timeout);
-      reject(new Error("aborted"));
-    };
-
-    signal.addEventListener("abort", abort, { once: true });
-  });
-}
+const CUTOUT_ERROR =
+  "Could not cut out that photo. Try a clearer shot on a plain surface.";
 
 export default function GeneratePage() {
   const router = useRouter();
   const mounted = useRef(true);
   const [profile, setProfile] = useState<MeResponse | null>(null);
   const workflow: Workflow = "studio";
+  const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
   const [uploadError, setUploadError] = useState("");
   const [generationError, setGenerationError] = useState("");
@@ -96,6 +80,7 @@ export default function GeneratePage() {
   function handleUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) {
+      setFile(null);
       setFileName("");
       setUploadError("");
       return;
@@ -104,11 +89,13 @@ export default function GeneratePage() {
     const error = validateUpload(file);
     if (error) {
       event.target.value = "";
+      setFile(null);
       setFileName("");
       setUploadError(error);
       return;
     }
 
+    setFile(file);
     setFileName(file.name);
     setUploadError("");
   }
@@ -116,13 +103,17 @@ export default function GeneratePage() {
   async function handleGenerate() {
     setGenerationError("");
 
+    if (!file) {
+      return;
+    }
+
     if (!hasEnoughCredits(balance, workflow)) {
       setCreditsModalOpen(true);
       return;
     }
 
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 30_000);
+    let timeout: number | undefined;
     const progress = window.setInterval(() => {
       setActiveIndex((index) => Math.min(index + 1, stages.length - 1));
     }, 1_500);
@@ -131,10 +122,35 @@ export default function GeneratePage() {
     setActiveIndex(0);
 
     try {
+      let cutout: Blob;
+      try {
+        cutout = await removeBackground(file);
+      } catch {
+        if (mounted.current) {
+          setGenerationError(CUTOUT_ERROR);
+        }
+        return;
+      }
+
+      if (!mounted.current) {
+        return;
+      }
+
+      setActiveIndex((index) => Math.max(index, 1));
+
+      const form = new FormData();
+      form.set("background", studioBackground);
+      form.set(
+        "cutout",
+        new File([cutout], "cutout.png", {
+          type: cutout.type || "image/png",
+        }),
+      );
+
+      timeout = window.setTimeout(() => controller.abort(), 30_000);
       const response = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ workflow }),
+        body: form,
         signal: controller.signal,
       });
 
@@ -148,31 +164,15 @@ export default function GeneratePage() {
       }
 
       const created = (await response.json()) as { id: string };
-
-      while (!controller.signal.aborted) {
-        await wait(3_000, controller.signal);
-        const pollResponse = await fetch(`/api/generations/${created.id}`, {
-          signal: controller.signal,
-        });
-        if (!pollResponse.ok) {
-          throw new Error("poll");
-        }
-
-        const generation = (await pollResponse.json()) as GenerationResponse;
-        if (generation.status === "done") {
-          router.push(`/results/${created.id}`);
-          return;
-        }
-        if (generation.status === "failed") {
-          throw new Error("generation");
-        }
-      }
+      router.push(`/results/${created.id}`);
     } catch {
       if (mounted.current) {
         setGenerationError("Generation failed. Try again.");
       }
     } finally {
-      window.clearTimeout(timeout);
+      if (timeout !== undefined) {
+        window.clearTimeout(timeout);
+      }
       window.clearInterval(progress);
       if (mounted.current) {
         setGenerating(false);
@@ -288,7 +288,7 @@ export default function GeneratePage() {
               <Button
                 className="mt-8 w-full"
                 type="button"
-                disabled={generating || profile === null}
+                disabled={generating || profile === null || !file}
                 onClick={() => void handleGenerate()}
               >
                 {generating ? "Generating…" : `Generate · ${cost} credits`}

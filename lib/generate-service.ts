@@ -1,8 +1,6 @@
 import { composeCatalogPack } from "./catalog-compose";
 import type { CatalogBackground } from "./catalog-pack";
 import { creditCost, hasEnoughCredits } from "./credits";
-import { uploadCatalogPack } from "./supabase/storage";
-import { createServerClient } from "./supabase/server";
 import type { Workflow } from "./types";
 
 export type GenerateInput = {
@@ -30,32 +28,22 @@ export type GenerationRepo = {
 export type GenerateOptions = {
   now?: () => Promise<void>;
   compose?: (cutoutPng: Buffer, background: CatalogBackground) => Promise<CatalogPack>;
-  upload?: (args: {
+  upload: (args: {
     userId: string;
     jobId: string;
     pack: CatalogPack;
   }) => Promise<string[]>;
 };
 
-async function defaultUpload(args: {
-  userId: string;
-  jobId: string;
-  pack: CatalogPack;
-}): Promise<string[]> {
-  const supabase = await createServerClient();
-  return uploadCatalogPack({
-    supabase,
-    userId: args.userId,
-    jobId: args.jobId,
-    pack: args.pack,
-  });
-}
-
 export async function executeGenerate(
   repo: GenerationRepo,
   input: GenerateInput,
-  options?: GenerateOptions,
+  options: GenerateOptions,
 ): Promise<GenerateOk | GenerateErr> {
+  if (typeof options.upload !== "function") {
+    throw new Error("upload is required");
+  }
+
   if (input.workflow !== "studio") {
     return { ok: false, status: 400, message: "Invalid workflow." };
   }
@@ -70,12 +58,12 @@ export async function executeGenerate(
   }
 
   const { id } = await repo.insertRunning(input.userId, input.workflow);
-  if (options?.now) {
+  if (options.now) {
     await options.now();
   }
 
-  const compose = options?.compose ?? composeCatalogPack;
-  const upload = options?.upload ?? defaultUpload;
+  const compose = options.compose ?? composeCatalogPack;
+  const upload = options.upload;
 
   let outputPaths: string[];
   try {

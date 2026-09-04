@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
-import { catalogSlotLabel } from "@/lib/catalog-results";
+import { catalogDownloadHref, catalogSlotLabel } from "@/lib/catalog-results";
 import { getUserId } from "@/lib/supabase/adapter";
 import { createServerClient } from "@/lib/supabase/server";
 import type { Workflow } from "@/lib/types";
@@ -115,7 +115,7 @@ export default async function ResultPage({
                       {catalogSlotLabel(index, generation.workflow)}
                     </h2>
                     <a
-                      href={path}
+                      href={catalogDownloadHref(path, index, generation.workflow)}
                       download
                       className="text-sm font-medium text-[var(--drape-accent)]"
                     >

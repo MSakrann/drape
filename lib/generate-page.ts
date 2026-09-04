@@ -7,6 +7,7 @@ export type UploadCandidate = {
 
 export const UPLOAD_ERROR = "Use a JPEG or PNG up to 10MB.";
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+export const GENERATE_CLIENT_TIMEOUT_MS = 90_000;
 
 export const WORKFLOW_TABS: { workflow: Workflow; label: string }[] = [
   { workflow: "studio", label: "Catalog pack" },

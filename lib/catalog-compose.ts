@@ -33,7 +33,9 @@ async function composeOne(
     .png()
     .toBuffer();
 
-  const pad = CATALOG_SHADOW.blur + Math.abs(CATALOG_SHADOW.offsetY);
+  const pad = 3 * CATALOG_SHADOW.blur + Math.abs(CATALOG_SHADOW.offsetY);
+  const shadowWidth = box.width + pad * 2;
+  const shadowHeight = box.height + pad * 2;
 
   const shadow = await sharp(resized)
     .recomb([
@@ -53,6 +55,45 @@ async function composeOne(
     .png()
     .toBuffer();
 
+  const placed = cropOverlayToCanvas(
+    {
+      width: shadowWidth,
+      height: shadowHeight,
+      left: box.x + CATALOG_SHADOW.offsetX - pad,
+      top: box.y + CATALOG_SHADOW.offsetY - pad,
+    },
+    canvas,
+  );
+
+  const layers: {
+    input: Buffer;
+    left: number;
+    top: number;
+    blend: "over";
+  }[] = [];
+  if (placed) {
+    layers.push({
+      input: await sharp(shadow)
+        .extract({
+          left: placed.extractLeft,
+          top: placed.extractTop,
+          width: placed.width,
+          height: placed.height,
+        })
+        .png()
+        .toBuffer(),
+      left: placed.left,
+      top: placed.top,
+      blend: "over",
+    });
+  }
+  layers.push({
+    input: resized,
+    left: box.x,
+    top: box.y,
+    blend: "over",
+  });
+
   return sharp({
     create: {
       width: canvas.width,
@@ -61,23 +102,51 @@ async function composeOne(
       background: bg,
     },
   })
-    .composite([
-      {
-        input: shadow,
-        left: box.x + CATALOG_SHADOW.offsetX - pad,
-        top: box.y + CATALOG_SHADOW.offsetY - pad,
-        blend: "over",
-      },
-      {
-        input: resized,
-        left: box.x,
-        top: box.y,
-        blend: "over",
-      },
-    ])
+    .composite(layers)
     .toColorspace("srgb")
     .jpeg({ quality: 90 })
     .toBuffer();
+}
+
+function cropOverlayToCanvas(
+  overlay: { width: number; height: number; left: number; top: number },
+  canvas: { width: number; height: number },
+): {
+  extractLeft: number;
+  extractTop: number;
+  width: number;
+  height: number;
+  left: number;
+  top: number;
+} | null {
+  let extractLeft = 0;
+  let extractTop = 0;
+  let width = overlay.width;
+  let height = overlay.height;
+  let left = overlay.left;
+  let top = overlay.top;
+
+  if (left < 0) {
+    extractLeft = -left;
+    width -= extractLeft;
+    left = 0;
+  }
+  if (top < 0) {
+    extractTop = -top;
+    height -= extractTop;
+    top = 0;
+  }
+  if (left + width > canvas.width) {
+    width = canvas.width - left;
+  }
+  if (top + height > canvas.height) {
+    height = canvas.height - top;
+  }
+  if (width <= 0 || height <= 0) {
+    return null;
+  }
+
+  return { extractLeft, extractTop, width, height, left, top };
 }
 
 export async function composeCatalogPack(

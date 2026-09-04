@@ -11,7 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { catalogProgressStages } from "@/lib/catalog-pack";
 import { creditCost, hasEnoughCredits } from "@/lib/credits";
+import { downscaleCutout } from "@/lib/cutout-resize";
 import {
+  GENERATE_CLIENT_TIMEOUT_MS,
   WORKFLOW_OPTIONS,
   WORKFLOW_TABS,
   validateUpload,
@@ -122,7 +124,7 @@ export default function GeneratePage() {
     try {
       let cutout: Blob;
       try {
-        cutout = await removeBackground(file);
+        cutout = await downscaleCutout(await removeBackground(file));
       } catch {
         if (mounted.current) {
           setGenerationError(CUTOUT_ERROR);
@@ -148,7 +150,10 @@ export default function GeneratePage() {
         setActiveIndex((index) => Math.min(index + 1, stages.length - 1));
       }, 1_500);
 
-      timeout = window.setTimeout(() => controller.abort(), 30_000);
+      timeout = window.setTimeout(
+        () => controller.abort(),
+        GENERATE_CLIENT_TIMEOUT_MS,
+      );
       const response = await fetch("/api/generate", {
         method: "POST",
         body: form,

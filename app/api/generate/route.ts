@@ -3,6 +3,7 @@ import sharp from "sharp";
 
 import { composeCatalogPack } from "@/lib/catalog-compose";
 import type { CatalogBackground } from "@/lib/catalog-pack";
+import { MAX_UPLOAD_BYTES } from "@/lib/generate-page";
 import { executeGenerate } from "@/lib/generate-service";
 import {
   getUserId,
@@ -11,7 +12,10 @@ import {
 import { createServerClient } from "@/lib/supabase/server";
 import { uploadCatalogPack } from "@/lib/supabase/storage";
 
+export const maxDuration = 60;
+
 const BACKGROUNDS = new Set<CatalogBackground>(["white", "grey"]);
+const MAX_CUTOUT_PIXELS = 4096 * 4096;
 
 async function cutoutToPng(file: File): Promise<Buffer | null> {
   const bytes = Buffer.from(await file.arrayBuffer());
@@ -19,7 +23,11 @@ async function cutoutToPng(file: File): Promise<Buffer | null> {
     return bytes;
   }
   if (file.type === "image/jpeg" || file.type === "image/jpg") {
-    return sharp(bytes).png().toBuffer();
+    try {
+      return sharp(bytes, { limitInputPixels: MAX_CUTOUT_PIXELS }).png().toBuffer();
+    } catch {
+      return null;
+    }
   }
   return null;
 }
@@ -55,6 +63,13 @@ export async function POST(request: Request) {
 
   const cutout = form.get("cutout");
   if (!(cutout instanceof File) || cutout.size === 0) {
+    return NextResponse.json(
+      { message: "Invalid cutout." },
+      { status: 400 },
+    );
+  }
+
+  if (cutout.size > MAX_UPLOAD_BYTES) {
     return NextResponse.json(
       { message: "Invalid cutout." },
       { status: 400 },

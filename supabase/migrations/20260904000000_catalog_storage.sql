@@ -1,10 +1,22 @@
-insert into storage.buckets (id, name, public)
-values ('catalog', 'catalog', true)
-on conflict (id) do nothing;
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('catalog', 'catalog', true, 10485760, array['image/jpeg']::text[])
+on conflict (id) do update
+set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
 
-create policy "catalog public read"
+drop policy if exists "catalog public read" on storage.objects;
+drop policy if exists "catalog authenticated select own prefix" on storage.objects;
+drop policy if exists "catalog authenticated insert own prefix" on storage.objects;
+
+create policy "catalog authenticated select own prefix"
 on storage.objects for select
-using (bucket_id = 'catalog');
+to authenticated
+using (
+  bucket_id = 'catalog'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
 
 create policy "catalog authenticated insert own prefix"
 on storage.objects for insert

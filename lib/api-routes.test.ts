@@ -37,6 +37,7 @@ vi.mock("@/lib/supabase/storage", () => ({
 import { POST as generate } from "@/app/api/generate/route";
 import { GET as generations } from "@/app/api/generations/route";
 import { POST as choosePlan } from "@/app/api/billing/choose-plan/route";
+import { MAX_UPLOAD_BYTES } from "@/lib/generate-page";
 
 function authenticatedClient(extra: object = {}) {
   return {
@@ -110,6 +111,26 @@ describe("POST /api/generate", () => {
       new Request("http://localhost/api/generate", {
         method: "POST",
         body: catalogForm({ background: "white" }),
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ message: "Invalid cutout." });
+    expect(executeGenerateMock).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 when the cutout exceeds MAX_UPLOAD_BYTES", async () => {
+    createServerClientMock.mockResolvedValue(authenticatedClient());
+    const oversized = new File(
+      [new Uint8Array(MAX_UPLOAD_BYTES + 1)],
+      "cutout.png",
+      { type: "image/png" },
+    );
+
+    const response = await generate(
+      new Request("http://localhost/api/generate", {
+        method: "POST",
+        body: catalogForm({ background: "white", cutout: oversized }),
       }),
     );
 

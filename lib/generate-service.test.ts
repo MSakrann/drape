@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { executeGenerate, type GenerateInput, type GenerationRepo, type ProfileRow } from "./generate-service";
+import { executeGenerate, type GenerateInput, type GenerateOptions, type GenerationRepo, type ProfileRow } from "./generate-service";
 
 const cutout = Buffer.from("png");
 
@@ -70,6 +70,17 @@ function fakeRepo(init: {
 }
 
 describe("executeGenerate", () => {
+  it("rejects when upload is missing", async () => {
+    const repo = fakeRepo({ credits: 20 });
+    await expect(
+      executeGenerate(repo, studioInput, {
+        now: offline.now,
+        compose: offline.compose,
+      } as unknown as GenerateOptions),
+    ).rejects.toThrow("upload is required");
+    expect(repo.rows).toHaveLength(0);
+  });
+
   it("returns 401 when getProfile returns null", async () => {
     const repo = fakeRepo({ credits: 20, profile: null });
     const result = await executeGenerate(repo, studioInput, offline);
@@ -89,7 +100,7 @@ describe("executeGenerate", () => {
     const repo = fakeRepo({ credits: 20 });
     const result = await executeGenerate(
       repo,
-      { userId: "u1", workflow: "video", background: "white", cutoutPng: cutout } as GenerateInput,
+      { userId: "u1", workflow: "video", background: "white", cutoutPng: cutout } as unknown as GenerateInput,
       offline,
     );
     expect(result).toEqual({ ok: false, status: 400, message: "Invalid workflow." });

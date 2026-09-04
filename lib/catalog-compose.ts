@@ -33,6 +33,8 @@ async function composeOne(
     .png()
     .toBuffer();
 
+  const pad = CATALOG_SHADOW.blur + Math.abs(CATALOG_SHADOW.offsetY);
+
   const shadow = await sharp(resized)
     .recomb([
       [0, 0, 0],
@@ -40,6 +42,13 @@ async function composeOne(
       [0, 0, 0],
     ])
     .linear([0, 0, 0, CATALOG_SHADOW.opacity], [0, 0, 0, 0])
+    .extend({
+      top: pad,
+      bottom: pad,
+      left: pad,
+      right: pad,
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
     .blur(CATALOG_SHADOW.blur)
     .png()
     .toBuffer();
@@ -55,8 +64,8 @@ async function composeOne(
     .composite([
       {
         input: shadow,
-        left: box.x + CATALOG_SHADOW.offsetX,
-        top: box.y + CATALOG_SHADOW.offsetY,
+        left: box.x + CATALOG_SHADOW.offsetX - pad,
+        top: box.y + CATALOG_SHADOW.offsetY - pad,
         blend: "over",
       },
       {

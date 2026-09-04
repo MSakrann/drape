@@ -1,11 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { createServerClientMock, executeGenerateMock, executeChoosePlanMock } =
-  vi.hoisted(() => ({
-    createServerClientMock: vi.fn(),
-    executeGenerateMock: vi.fn(),
-    executeChoosePlanMock: vi.fn(),
-  }));
+const {
+  createServerClientMock,
+  executeGenerateMock,
+  executeChoosePlanMock,
+  composeCatalogPackMock,
+  uploadCatalogPackMock,
+} = vi.hoisted(() => ({
+  createServerClientMock: vi.fn(),
+  executeGenerateMock: vi.fn(),
+  executeChoosePlanMock: vi.fn(),
+  composeCatalogPackMock: vi.fn(),
+  uploadCatalogPackMock: vi.fn(),
+}));
 
 vi.mock("@/lib/supabase/server", () => ({
   createServerClient: createServerClientMock,
@@ -17,6 +24,14 @@ vi.mock("@/lib/generate-service", () => ({
 
 vi.mock("@/lib/choose-plan", () => ({
   executeChoosePlan: executeChoosePlanMock,
+}));
+
+vi.mock("@/lib/catalog-compose", () => ({
+  composeCatalogPack: composeCatalogPackMock,
+}));
+
+vi.mock("@/lib/supabase/storage", () => ({
+  uploadCatalogPack: uploadCatalogPackMock,
 }));
 
 import { POST as generate } from "@/app/api/generate/route";
@@ -53,6 +68,8 @@ describe("POST /api/generate", () => {
   beforeEach(() => {
     createServerClientMock.mockReset();
     executeGenerateMock.mockReset();
+    composeCatalogPackMock.mockReset();
+    uploadCatalogPackMock.mockReset();
   });
 
   it("returns 401 when there is no session user", async () => {
@@ -102,7 +119,8 @@ describe("POST /api/generate", () => {
   });
 
   it("parses multipart and calls executeGenerate for studio", async () => {
-    createServerClientMock.mockResolvedValue(authenticatedClient());
+    const supabase = authenticatedClient();
+    createServerClientMock.mockResolvedValue(supabase);
     executeGenerateMock.mockResolvedValue({
       ok: true,
       id: "job-1",
@@ -123,6 +141,25 @@ describe("POST /api/generate", () => {
     expect(input.workflow).toBe("studio");
     expect(input.background).toBe("grey");
     expect(Buffer.isBuffer(input.cutoutPng)).toBe(true);
+
+    const options = executeGenerateMock.mock.calls[0][2] as {
+      compose: unknown;
+      upload: (args: { userId: string; jobId: string; pack: { shop: Buffer; story: Buffer; whatsapp: Buffer } }) => Promise<string[]>;
+    };
+    expect(options.compose).toBe(composeCatalogPackMock);
+
+    const pack = {
+      shop: Buffer.from("s"),
+      story: Buffer.from("t"),
+      whatsapp: Buffer.from("w"),
+    };
+    await options.upload({ userId: "user-1", jobId: "job-1", pack });
+    expect(uploadCatalogPackMock).toHaveBeenCalledWith({
+      supabase,
+      userId: "user-1",
+      jobId: "job-1",
+      pack,
+    });
   });
 });
 

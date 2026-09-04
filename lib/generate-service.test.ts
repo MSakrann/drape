@@ -27,6 +27,7 @@ const offline = {
 function fakeRepo(init: {
   credits: number;
   failInsert?: boolean;
+  failDecrement?: boolean;
   profile?: ProfileRow | null;
 }): GenerationRepo & { credits: number; rows: { id: string; status: string; creditsUsed: number }[] } {
   const state = {
@@ -62,6 +63,7 @@ function fakeRepo(init: {
       row.error = errorMessage;
     },
     async decrementCredits(_userId, amount) {
+      if (init.failDecrement) throw new Error("decrement failed");
       state.credits -= amount;
     },
   };
@@ -133,5 +135,12 @@ describe("executeGenerate", () => {
     if (!result.ok) expect(result.status).toBe(500);
     expect(repo.credits).toBe(20);
     expect(repo.rows[0].status).toBe("failed");
+  });
+
+  it("does not markFailed when decrementCredits throws after a successful pack", async () => {
+    const repo = fakeRepo({ credits: 20, failDecrement: true });
+    await expect(executeGenerate(repo, studioInput, offline)).rejects.toThrow("decrement failed");
+    expect(repo.rows[0].status).toBe("done");
+    expect(repo.credits).toBe(20);
   });
 });

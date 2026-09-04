@@ -77,20 +77,22 @@ export async function executeGenerate(
   const compose = options?.compose ?? composeCatalogPack;
   const upload = options?.upload ?? defaultUpload;
 
+  let outputPaths: string[];
   try {
     const pack = await compose(input.cutoutPng, input.background);
-    const outputPaths = await upload({
+    outputPaths = await upload({
       userId: input.userId,
       jobId: id,
       pack,
     });
-    const creditsUsed = creditCost(input.workflow);
-    await repo.markDone(id, outputPaths, creditsUsed);
-    await repo.decrementCredits(input.userId, creditsUsed);
-    return { ok: true, id, outputPaths, creditsUsed };
   } catch {
     const message = "Generation failed. Try again.";
     await repo.markFailed(id, message);
     return { ok: false, status: 500, message };
   }
+
+  const creditsUsed = creditCost(input.workflow);
+  await repo.markDone(id, outputPaths, creditsUsed);
+  await repo.decrementCredits(input.userId, creditsUsed);
+  return { ok: true, id, outputPaths, creditsUsed };
 }

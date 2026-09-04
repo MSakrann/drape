@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import sharp from "sharp";
 
-import { executeGenerate } from "@/lib/generate-service";
+import { composeCatalogPack } from "@/lib/catalog-compose";
 import type { CatalogBackground } from "@/lib/catalog-pack";
+import { executeGenerate } from "@/lib/generate-service";
 import {
   getUserId,
   supabaseGenerationRepo,
 } from "@/lib/supabase/adapter";
 import { createServerClient } from "@/lib/supabase/server";
+import { uploadCatalogPack } from "@/lib/supabase/storage";
 
 const BACKGROUNDS = new Set<CatalogBackground>(["white", "grey"]);
 
@@ -67,12 +69,20 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = await executeGenerate(supabaseGenerationRepo(supabase), {
-    userId,
-    workflow: "studio",
-    background: background as CatalogBackground,
-    cutoutPng,
-  });
+  const result = await executeGenerate(
+    supabaseGenerationRepo(supabase),
+    {
+      userId,
+      workflow: "studio",
+      background: background as CatalogBackground,
+      cutoutPng,
+    },
+    {
+      compose: composeCatalogPack,
+      upload: ({ userId, jobId, pack }) =>
+        uploadCatalogPack({ supabase, userId, jobId, pack }),
+    },
+  );
 
   return NextResponse.json(result, {
     status: result.ok ? 200 : result.status,

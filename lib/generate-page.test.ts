@@ -12,34 +12,11 @@ import {
 
 describe("generate workflow options", () => {
   it("uses the exact workflow tab labels", () => {
-    expect(WORKFLOW_TABS.map((tab) => tab.label)).toEqual([
-      "Studio",
-      "Try-On",
-      "Lifestyle",
-      "Video",
-      "Variants",
-    ]);
+    expect(WORKFLOW_TABS.map((tab) => tab.label)).toEqual(["Catalog pack"]);
   });
 
   it("provides all required choices", () => {
-    expect(WORKFLOW_OPTIONS.studio).toEqual(["white", "grey", "gradient"]);
-    expect(WORKFLOW_OPTIONS.tryon).toEqual(
-      Array.from({ length: 8 }, (_, index) => `Model ${index + 1}`),
-    );
-    expect(WORKFLOW_OPTIONS.lifestyle).toEqual([
-      "Cairo interior",
-      "Nile",
-      "studio loft",
-      "street",
-      "beach",
-    ]);
-    expect(WORKFLOW_OPTIONS.video).toEqual(["15 seconds"]);
-    expect(WORKFLOW_OPTIONS.variants).toEqual([
-      "navy",
-      "dusty rose",
-      "olive",
-      "cream",
-    ]);
+    expect(WORKFLOW_OPTIONS.studio).toEqual(["white", "grey"]);
   });
 });
 

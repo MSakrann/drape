@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { catalogProgressStages } from "./catalog-pack";
 import { SAMPLE_PATHS, mockDelayMs, pickOutputPaths, progressStages } from "./mock-generate";
 
 describe("SAMPLE_PATHS", () => {
@@ -39,6 +40,9 @@ describe("mockDelayMs", () => {
 describe("progressStages", () => {
   it("ends with Rendering video for video", () => {
     expect(progressStages("video").at(-1)).toBe("Rendering video...");
-    expect(progressStages("studio").at(-1)).toBe("Upscaling...");
+  });
+
+  it("uses catalog pack stages for studio", () => {
+    expect(progressStages("studio")).toEqual(catalogProgressStages());
   });
 });

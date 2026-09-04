@@ -21,7 +21,7 @@ type Generation = {
 };
 
 const WORKFLOW_LABELS: Record<Workflow, string> = {
-  studio: "Studio",
+  studio: "Catalog pack",
   tryon: "Try-on",
   lifestyle: "Lifestyle",
   video: "Video",

@@ -9,13 +9,13 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { catalogProgressStages } from "@/lib/catalog-pack";
 import { creditCost, hasEnoughCredits } from "@/lib/credits";
 import {
   WORKFLOW_OPTIONS,
   WORKFLOW_TABS,
   validateUpload,
 } from "@/lib/generate-page";
-import { progressStages } from "@/lib/mock-generate";
 import type { GenerationStatus, Plan, Workflow } from "@/lib/types";
 
 type MeResponse = {
@@ -50,7 +50,7 @@ export default function GeneratePage() {
   const router = useRouter();
   const mounted = useRef(true);
   const [profile, setProfile] = useState<MeResponse | null>(null);
-  const [workflow, setWorkflow] = useState<Workflow>("studio");
+  const workflow: Workflow = "studio";
   const [fileName, setFileName] = useState("");
   const [uploadError, setUploadError] = useState("");
   const [generationError, setGenerationError] = useState("");
@@ -58,13 +58,10 @@ export default function GeneratePage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [creditsModalOpen, setCreditsModalOpen] = useState(false);
   const [studioBackground, setStudioBackground] = useState("white");
-  const [model, setModel] = useState("Model 1");
-  const [lifestyle, setLifestyle] = useState("Cairo interior");
-  const [variantColors, setVariantColors] = useState<string[]>([]);
 
   const balance = profile?.credits ?? 0;
   const cost = creditCost(workflow);
-  const stages = progressStages(workflow);
+  const stages = catalogProgressStages();
 
   useEffect(() => {
     mounted.current = true;
@@ -96,15 +93,6 @@ export default function GeneratePage() {
     };
   }, [router]);
 
-  function selectWorkflow(nextWorkflow: Workflow) {
-    if (generating) {
-      return;
-    }
-    setWorkflow(nextWorkflow);
-    setGenerationError("");
-    setActiveIndex(0);
-  }
-
   function handleUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) {
@@ -123,16 +111,6 @@ export default function GeneratePage() {
 
     setFileName(file.name);
     setUploadError("");
-  }
-
-  function toggleVariant(color: string) {
-    setVariantColors((selected) =>
-      selected.includes(color)
-        ? selected.filter((item) => item !== color)
-        : selected.length < 4
-          ? [...selected, color]
-          : selected,
-    );
   }
 
   async function handleGenerate() {
@@ -213,23 +191,20 @@ export default function GeneratePage() {
           <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-6xl">
             Create your campaign
           </h1>
+          <p className="mt-4 max-w-2xl text-lg text-[var(--drape-muted)]">
+            Upload a phone photo of the garment. We cut it out and export Shop,
+            Story, and WhatsApp sizes.
+          </p>
 
-          <div
-            className="mt-8 flex gap-2 overflow-x-auto pb-2"
-            role="tablist"
-            aria-label="Generation workflow"
-          >
+          <div className="mt-8 flex gap-2 pb-2">
             {WORKFLOW_TABS.map((tab) => (
-              <button
+              <span
                 key={tab.workflow}
-                type="button"
-                role="tab"
-                aria-selected={workflow === tab.workflow}
                 className="drape-chip shrink-0"
-                onClick={() => selectWorkflow(tab.workflow)}
+                data-active="true"
               >
                 {tab.label}
-              </button>
+              </span>
             ))}
           </div>
 
@@ -265,91 +240,31 @@ export default function GeneratePage() {
 
             <Card className="p-6 sm:p-8">
               <h2 className="text-2xl font-semibold tracking-tight">
-                {WORKFLOW_TABS.find((tab) => tab.workflow === workflow)?.label} options
+                Catalog pack options
               </h2>
               <div className="mt-6">
-                {workflow === "studio" ? (
-                  <fieldset>
-                    <legend className="sr-only">Studio background</legend>
-                    <div className="grid gap-3 sm:grid-cols-3">
-                      {WORKFLOW_OPTIONS.studio.map((option) => (
-                        <label
-                          key={option}
-                          className={optionButtonClass}
-                          data-active={studioBackground === option}
-                        >
-                          <input
-                            className="sr-only"
-                            type="radio"
-                            name="studio-background"
-                            value={option}
-                            checked={studioBackground === option}
-                            onChange={() => setStudioBackground(option)}
-                          />
-                          {option}
-                        </label>
-                      ))}
-                    </div>
-                  </fieldset>
-                ) : null}
-
-                {workflow === "tryon" ? (
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    {WORKFLOW_OPTIONS.tryon.map((option) => (
-                      <button
+                <fieldset>
+                  <legend className="sr-only">Studio background</legend>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {WORKFLOW_OPTIONS.studio.map((option) => (
+                      <label
                         key={option}
-                        type="button"
-                        aria-pressed={model === option}
                         className={optionButtonClass}
-                        onClick={() => setModel(option)}
+                        data-active={studioBackground === option}
                       >
-                        {option}
-                      </button>
+                        <input
+                          className="sr-only"
+                          type="radio"
+                          name="studio-background"
+                          value={option}
+                          checked={studioBackground === option}
+                          onChange={() => setStudioBackground(option)}
+                        />
+                        {option === "white" ? "White" : "Grey"}
+                      </label>
                     ))}
                   </div>
-                ) : null}
-
-                {workflow === "lifestyle" ? (
-                  <label className="block text-xs font-medium uppercase tracking-wide text-[var(--drape-dim)]">
-                    Scene
-                    <select
-                      className="drape-input"
-                      value={lifestyle}
-                      onChange={(event) => setLifestyle(event.target.value)}
-                    >
-                      {WORKFLOW_OPTIONS.lifestyle.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                ) : null}
-
-                {workflow === "video" ? (
-                  <div className="rounded-[0.875rem] border border-white/12 bg-[var(--drape-bg)] px-4 py-3">
-                    <span className="text-xs font-medium uppercase tracking-wide text-[var(--drape-dim)]">
-                      Duration
-                    </span>
-                    <p className="mt-1 text-lg">15 seconds</p>
-                  </div>
-                ) : null}
-
-                {workflow === "variants" ? (
-                  <div className="grid grid-cols-2 gap-3">
-                    {WORKFLOW_OPTIONS.variants.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        aria-pressed={variantColors.includes(color)}
-                        className={optionButtonClass}
-                        onClick={() => toggleVariant(color)}
-                      >
-                        {color}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
+                </fieldset>
               </div>
 
               {generating ? (

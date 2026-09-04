@@ -8,13 +8,7 @@ import type { Plan } from "@/lib/types";
 
 import { PlanCards } from "./plan-cards";
 
-const creditCosts = [
-  ["Studio", CREDIT_COSTS.studio],
-  ["Lifestyle", CREDIT_COSTS.lifestyle],
-  ["Try-on", CREDIT_COSTS.tryon],
-  ["Variants", CREDIT_COSTS.variants],
-  ["Video", CREDIT_COSTS.video],
-] as const;
+const creditCosts = [["Catalog pack", CREDIT_COSTS.studio]] as const;
 
 export default async function PricingPage() {
   const supabase = await createServerClient();
@@ -69,6 +63,9 @@ export default async function PricingPage() {
                   <h3 className="text-xl font-semibold">{workflow}</h3>
                   <p className="mt-4 text-[var(--drape-muted)]">
                     {cost} {cost === 1 ? "credit" : "credits"}
+                  </p>
+                  <p className="mt-2 text-sm text-[var(--drape-muted)]">
+                    Studio photos from a phone shot — Shop, Story, WhatsApp.
                   </p>
                 </Card>
               ))}

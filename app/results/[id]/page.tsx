@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
+import { catalogSlotLabel } from "@/lib/catalog-results";
 import { getUserId } from "@/lib/supabase/adapter";
 import { createServerClient } from "@/lib/supabase/server";
 import type { Workflow } from "@/lib/types";
@@ -96,13 +97,13 @@ export default async function ResultPage({
                     href={path}
                     target="_blank"
                     rel="noreferrer"
-                    aria-label={`Open output ${index + 1} full size`}
+                    aria-label={`Open ${catalogSlotLabel(index, generation.workflow)} full size`}
                     className="block"
                   >
                     <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-white/[0.03]">
                       <Image
                         src={path}
-                        alt={`${WORKFLOW_LABELS[generation.workflow]} output ${index + 1}`}
+                        alt={catalogSlotLabel(index, generation.workflow)}
                         fill
                         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                         className="object-cover transition-transform hover:scale-[1.02]"
@@ -110,11 +111,9 @@ export default async function ResultPage({
                     </div>
                   </a>
                   <div className="flex items-center justify-between gap-4 px-3 py-4">
-                    <span className="text-sm font-medium text-[var(--drape-muted)]">
-                      {generation.workflow === "video"
-                        ? "Video preview (mock)"
-                        : `Output ${index + 1}`}
-                    </span>
+                    <h2 className="text-sm font-medium text-[var(--drape-muted)]">
+                      {catalogSlotLabel(index, generation.workflow)}
+                    </h2>
                     <a
                       href={path}
                       download

@@ -16,5 +16,7 @@
 4. In Authentication > Providers, enable the Email provider.
 5. For local development, disable email confirmations so a new signup can
    proceed directly to the dashboard.
+6. Run `supabase/migrations/20260904000000_catalog_storage.sql` in the SQL
+   Editor to create the public `catalog` storage bucket and its policies.
 
 Install dependencies with `npm install`, then start the app with `npm run dev`.

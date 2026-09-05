@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
 import { catalogDownloadHref, catalogSlotLabel } from "@/lib/catalog-results";
+import { loadOrCreateProfile } from "@/lib/profile";
 import { getUserId } from "@/lib/supabase/adapter";
 import { createServerClient } from "@/lib/supabase/server";
 import type { Workflow } from "@/lib/types";
@@ -45,19 +46,11 @@ export default async function ResultPage({
       .eq("id", id)
       .eq("user_id", userId)
       .maybeSingle(),
-    supabase
-      .from("profiles")
-      .select("credits")
-      .eq("id", userId)
-      .single(),
+    loadOrCreateProfile(supabase, userId),
   ]);
 
   if (generationResult.error) {
-    throw generationResult.error;
-  }
-
-  if (profileResult.error) {
-    throw profileResult.error;
+    notFound();
   }
 
   if (!generationResult.data) {
@@ -68,7 +61,10 @@ export default async function ResultPage({
 
   return (
     <>
-      <SiteHeader signedIn credits={profileResult.data.credits} />
+      <SiteHeader
+        signedIn
+        credits={profileResult.ok ? profileResult.profile.credits : undefined}
+      />
       <main className="px-6 py-12 lg:px-10 lg:py-16">
         <div className="mx-auto max-w-7xl">
           <p className="text-sm font-medium text-[var(--drape-accent)]">

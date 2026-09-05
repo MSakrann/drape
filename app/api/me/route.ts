@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { loadOrCreateProfile } from "@/lib/profile";
 import { createServerClient } from "@/lib/supabase/server";
-import type { Plan } from "@/lib/types";
 
 export async function GET() {
   const supabase = await createServerClient();
@@ -16,21 +16,15 @@ export async function GET() {
     );
   }
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("credits, plan")
-    .eq("id", user.id)
-    .single();
+  const profile = await loadOrCreateProfile(supabase, user.id);
 
-  if (error) {
-    throw error;
+  if (!profile.ok) {
+    return NextResponse.json({ message: profile.message }, { status: 500 });
   }
 
-  const profile = data as { credits: number; plan: Plan };
-
   return NextResponse.json({
-    credits: profile.credits,
-    plan: profile.plan,
+    credits: profile.profile.credits,
+    plan: profile.profile.plan,
     email: user.email ?? "",
   });
 }

@@ -2,6 +2,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
 import { CREDIT_COSTS } from "@/lib/credits";
+import { loadOrCreateProfile } from "@/lib/profile";
 import { getUserId } from "@/lib/supabase/adapter";
 import { createServerClient } from "@/lib/supabase/server";
 import type { Plan } from "@/lib/types";
@@ -17,18 +18,11 @@ export default async function PricingPage() {
   let credits: number | undefined;
 
   if (userId) {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("plan, credits")
-      .eq("id", userId)
-      .single();
-
-    if (error) {
-      throw error;
+    const profile = await loadOrCreateProfile(supabase, userId);
+    if (profile.ok) {
+      currentPlan = profile.profile.plan;
+      credits = profile.profile.credits;
     }
-
-    currentPlan = data.plan as Plan;
-    credits = data.credits;
   }
 
   return (

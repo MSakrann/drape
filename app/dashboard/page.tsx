@@ -8,9 +8,10 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { loadOrCreateProfile } from "@/lib/profile";
 import { getUserId } from "@/lib/supabase/adapter";
 import { createServerClient } from "@/lib/supabase/server";
-import type { GenerationStatus, Plan, Workflow } from "@/lib/types";
+import type { GenerationStatus, Workflow } from "@/lib/types";
 
 type Generation = {
   id: string;
@@ -37,11 +38,7 @@ export default async function DashboardPage() {
   }
 
   const [profileResult, generationsResult] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("credits, plan")
-      .eq("id", userId)
-      .single(),
+    loadOrCreateProfile(supabase, userId),
     supabase
       .from("generations")
       .select("id, workflow, status, output_paths, created_at")
@@ -50,16 +47,25 @@ export default async function DashboardPage() {
       .limit(12),
   ]);
 
-  if (profileResult.error) {
-    throw profileResult.error;
+  if (!profileResult.ok) {
+    return (
+      <>
+        <SiteHeader signedIn />
+        <main className="px-6 py-16">
+          <p role="alert" className="mx-auto max-w-xl text-[var(--drape-muted)]">
+            Could not load your account. Run the Supabase SQL migrations from
+            the README, then sign in again.
+          </p>
+        </main>
+        <SiteFooter />
+      </>
+    );
   }
 
-  if (generationsResult.error) {
-    throw generationsResult.error;
-  }
-
-  const profile = profileResult.data as { credits: number; plan: Plan };
-  const generations = (generationsResult.data ?? []) as Generation[];
+  const profile = profileResult.profile;
+  const generations = (generationsResult.error
+    ? []
+    : (generationsResult.data ?? [])) as Generation[];
 
   return (
     <>

@@ -20,7 +20,7 @@ export default async function ResultsPage() {
     .maybeSingle();
 
   if (error) {
-    throw error;
+    redirect("/dashboard");
   }
 
   redirect(data ? `/results/${data.id}` : "/generate");

@@ -18,5 +18,7 @@
    proceed directly to the dashboard.
 6. Run `supabase/migrations/20260904000000_catalog_storage.sql` in the SQL
    Editor to create the public `catalog` storage bucket and its policies.
+7. Run `supabase/migrations/20260905000000_ensure_profile.sql` so a signed-in
+   user without a profile row gets a trial account instead of a server error.
 
 Install dependencies with `npm install`, then start the app with `npm run dev`.

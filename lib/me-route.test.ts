@@ -26,11 +26,11 @@ describe("GET /api/me", () => {
   });
 
   it("returns credits, plan, and email for the session user", async () => {
-    const single = vi.fn().mockResolvedValue({
+    const maybeSingle = vi.fn().mockResolvedValue({
       data: { credits: 18, plan: "trial" },
       error: null,
     });
-    const eq = vi.fn().mockReturnValue({ single });
+    const eq = vi.fn().mockReturnValue({ maybeSingle });
     const select = vi.fn().mockReturnValue({ eq });
     createServerClientMock.mockResolvedValue({
       auth: {

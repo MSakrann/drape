@@ -106,7 +106,7 @@ export function supabasePlanRepo(client: SupabaseClient): PlanRepo {
 
       throwIfError(error);
       if (!data || data.length === 0) {
-        throw new Error("You already have a plan.");
+        throw new Error("You're already on this plan.");
       }
     },
   };

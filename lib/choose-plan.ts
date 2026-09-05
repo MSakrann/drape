@@ -1,4 +1,4 @@
-import { canChoosePaidPlan, monthlyGrant } from "./credits";
+import { monthlyGrant } from "./credits";
 import type { Plan } from "./types";
 
 export type PlanRepo = {
@@ -22,8 +22,8 @@ export async function executeChoosePlan(
     return { ok: false, status: 401, message: "Please sign in again." };
   }
 
-  if (!canChoosePaidPlan(profile.plan)) {
-    return { ok: false, status: 409, message: "You already have a plan." };
+  if (profile.plan === plan) {
+    return { ok: false, status: 409, message: "You're already on this plan." };
   }
 
   const nextCredits = profile.credits + monthlyGrant(plan);

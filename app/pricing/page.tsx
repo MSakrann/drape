@@ -1,3 +1,6 @@
+import { IBM_Plex_Mono } from "next/font/google";
+
+import { InvoiceStage } from "@/app/invoice/invoice-stage";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
@@ -7,7 +10,10 @@ import { getUserId } from "@/lib/supabase/adapter";
 import { createServerClient } from "@/lib/supabase/server";
 import type { Plan } from "@/lib/types";
 
-import { PlanCards } from "./plan-cards";
+const receiptMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
 const creditCosts = [["Catalog pack", CREDIT_COSTS.studio]] as const;
 
@@ -42,10 +48,14 @@ export default async function PricingPage() {
             </p>
           </div>
 
-          <PlanCards
-            signedIn={Boolean(userId)}
-            currentPlan={currentPlan}
-          />
+          <div className="mt-12">
+            <InvoiceStage
+              receiptClassName={receiptMono.className}
+              checkout
+              signedIn={Boolean(userId)}
+              currentPlan={currentPlan}
+            />
+          </div>
 
           <section className="mt-20">
             <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">

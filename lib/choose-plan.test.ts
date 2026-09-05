@@ -39,10 +39,20 @@ describe("executeChoosePlan", () => {
     expect(result).toEqual({ ok: true, plan: "pro", credits: 170 });
   });
 
-  it("rejects a second paid plan", async () => {
+  it("rejects choosing the plan the user already has", async () => {
+    const r = repo("pro", 170);
+    const result = await executeChoosePlan(r, "u1", "pro");
+    expect(result).toEqual({
+      ok: false,
+      status: 409,
+      message: "You're already on this plan.",
+    });
+  });
+
+  it("upgrades from starter to pro and adds 150 credits", async () => {
     const r = repo("starter", 50);
     const result = await executeChoosePlan(r, "u1", "pro");
-    expect(result).toEqual({ ok: false, status: 409, message: "You already have a plan." });
+    expect(result).toEqual({ ok: true, plan: "pro", credits: 200 });
   });
 
   it("rejects trial as the chosen plan", async () => {
